@@ -1,0 +1,9 @@
+node_modules
+dist
+e2e
+tests
+docs
+.claude
+.git
+*.md
+.env
