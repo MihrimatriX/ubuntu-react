@@ -73,7 +73,7 @@ export function SearchResults({ query, onDone }: { query: string; onDone: () => 
 }
 
 /** Enter in a search field opens the first result of the same search. */
-export function openFirstResult(query: string) {
+function openFirstResult(query: string) {
   const results = searchAll(query, APPS, useOS.getState().fs);
   if (results.apps[0]) useOS.getState().openApp(results.apps[0].id);
   else if (results.files[0]) openPath(results.files[0]);

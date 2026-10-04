@@ -1,7 +1,7 @@
 // Minesweeper rules, pure: mines are placed on the first click (never on or around it), opening a cell
 // with no adjacent mines flood-fills its neighbours, and the game is won when every safe cell is open.
 
-export type Cell = { mine: boolean; adjacent: number; open: boolean; flag: boolean };
+type Cell = { mine: boolean; adjacent: number; open: boolean; flag: boolean };
 export type Board = Cell[][];
 
 const neighbours = (board: Board, row: number, col: number) =>

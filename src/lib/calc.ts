@@ -51,7 +51,7 @@ export function tokenize(input: string): Token[] {
 }
 
 /** Shunting-yard: infix tokens → reverse Polish notation. */
-export function toRpn(tokens: Token[]): Token[] {
+function toRpn(tokens: Token[]): Token[] {
   const output: Token[] = [];
   const stack: Token[] = [];
   for (const token of tokens) {

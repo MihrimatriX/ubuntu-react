@@ -11,7 +11,7 @@ export type Win = {
   minimized: boolean; workspace: number; z: number; filePath?: string; args?: string[]; dirty?: boolean; confirmClose?: boolean; above?: boolean;
 };
 
-export type OpenOptions = { filePath?: string; args?: string[]; newWindow?: boolean };
+type OpenOptions = { filePath?: string; args?: string[]; newWindow?: boolean };
 
 export type WindowSlice = {
   windows: Win[];
@@ -50,7 +50,7 @@ export function compactWorkspaces(windows: Win[], active: number): { windows: Wi
   return { windows: windows.map((win) => ({ ...win, workspace: remap(win.workspace) })), workspace: remap(active) };
 }
 
-export const currentArea = (state: OSState) =>
+const currentArea = (state: OSState) =>
   workArea({ w: globalThis.innerWidth || 1280, h: globalThis.innerHeight || 800 }, {
     position: state.settings.dockPosition, iconSize: state.settings.dockIconSize, autohide: state.settings.dockAutohide,
   });

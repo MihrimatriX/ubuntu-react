@@ -29,7 +29,7 @@ export type Settings = {
   wifi: boolean; bluetooth: boolean; nightLight: boolean; dnd: boolean; deviceName: string; starred: string[];
 };
 
-export const defaultSettings = (): Settings => ({
+const defaultSettings = (): Settings => ({
   theme: "light", accent: ACCENTS.Orange!, wallpaper: WALLPAPERS[0]!.url,
   dockPosition: "left", dockIconSize: 48, dockAutohide: false, dockPanel: true, dockTrash: false,
   desktopIconSize: 48, showHome: true, showTrash: true, hotCorner: true, powerMode: "balanced",
@@ -39,8 +39,8 @@ export const defaultSettings = (): Settings => ({
 
 export type Note = { id: number; title: string; body?: string; icon?: string; time: number; action?: { label: string; run: () => void } };
 export type Session = "boot" | "login" | "desktop" | "off";
-export type Overlay = "none" | "overview" | "grid";
-export type Clipboard = { paths: string[]; cut: boolean } | null;
+type Overlay = "none" | "overview" | "grid";
+type Clipboard = { paths: string[]; cut: boolean } | null;
 export type MenuItem = { label: string; action?: () => void; disabled?: boolean; checked?: boolean; shortcut?: string } | "separator";
 export type Menu = { x: number; y: number; items: MenuItem[] } | null;
 

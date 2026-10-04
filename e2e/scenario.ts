@@ -1,4 +1,4 @@
-// End-to-end scenario from the spec, driven through the real UI with the installed Chrome:
+// End-to-end scenario, driven through the real UI with the installed Chrome:
 // boot → login → Terminal `mkdir test && cd test && echo hi > a.txt` → visible in Files → double-click opens
 // Text Editor → edit → Ctrl+S → `cat` in Terminal shows the edit. Run with the dev server up: bun run e2e
 import { chromium, type Page } from "playwright-core";

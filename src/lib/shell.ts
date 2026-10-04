@@ -9,15 +9,15 @@ export type Effect =
   | { type: "clear" }
   | { type: "exit" };
 
-export type ShellEnv = { user: string; host: string; startedAt: number; resolution: string; cores: number; windows: number };
+type ShellEnv = { user: string; host: string; startedAt: number; resolution: string; cores: number; windows: number };
 export type ShellContext = { fs: Fs; cwd: string; history: string[]; env: ShellEnv };
-export type ShellResult = { output: string; fs: Fs; cwd: string; effects: Effect[]; code: number };
+type ShellResult = { output: string; fs: Fs; cwd: string; effects: Effect[]; code: number };
 
 /** What a command sees: mutable fs/cwd, stdin text, an stderr sink and whether stdout is the terminal. */
 export type IO = { ctx: ShellContext; stdin: string; tty: boolean; effects: Effect[]; err: (message: string) => void };
 export type Command = (args: string[], io: IO) => { out: string; code?: number };
 
-export class ShellError extends Error {}
+class ShellError extends Error {}
 
 type Token = { op: "|" | ">" | ">>" | "&&" } | { word: string };
 type Simple = { argv: string[]; redirect?: { path: string; append: boolean } };

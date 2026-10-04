@@ -7,8 +7,8 @@ export type SnapState = "normal" | "max" | "left" | "right";
 export type DockPosition = "left" | "bottom" | "right";
 export type Edge = "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw";
 
-export const TOPBAR_HEIGHT = 32;
-export const EDGE_THRESHOLD = 12;
+const TOPBAR_HEIGHT = 32;
+const EDGE_THRESHOLD = 12;
 const MIN_VISIBLE = 40;
 const HEADER_HEIGHT = 46;
 

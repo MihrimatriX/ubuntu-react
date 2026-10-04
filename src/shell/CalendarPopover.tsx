@@ -6,7 +6,7 @@ import { Switch } from "./chrome";
 import { NoteCard } from "./Notifications";
 
 /** 6×7 grid of dates for the month containing `month`, weeks starting on Sunday. */
-export function monthGrid(month: Date): Date[] {
+function monthGrid(month: Date): Date[] {
   const first = new Date(month.getFullYear(), month.getMonth(), 1);
   return Array.from({ length: 42 }, (_, index) => new Date(first.getFullYear(), first.getMonth(), index - first.getDay() + 1));
 }
