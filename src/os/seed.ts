@@ -44,12 +44,25 @@ print(greet("Ubuntu"))
 
 export function seedFs(): Fs {
   let fs: Fs = { "/": { type: "dir", mtime: Date.now(), size: 4096 } };
-  for (const dir of ["Desktop", "Documents", "Downloads", "Music", "Pictures/Wallpapers", "Videos", ".local/share/Trash/files", ".local/share/Trash/info"]) {
+  for (const dir of [
+    "Desktop",
+    "Documents",
+    "Downloads",
+    "Music",
+    "Pictures/Wallpapers",
+    "Videos",
+    ".local/share/Trash/files",
+    ".local/share/Trash/info",
+  ]) {
     fs = mkdir(fs, `${HOME}/${dir}`, true);
   }
   fs = mkdir(fs, "/etc", true);
   fs = write(fs, "/etc/hostname", "ubuntu\n");
-  fs = write(fs, "/etc/os-release", 'PRETTY_NAME="Ubuntu 24.04.1 LTS"\nNAME="Ubuntu"\nVERSION_ID="24.04"\nVERSION_CODENAME=noble\n');
+  fs = write(
+    fs,
+    "/etc/os-release",
+    'PRETTY_NAME="Ubuntu 24.04.1 LTS"\nNAME="Ubuntu"\nVERSION_ID="24.04"\nVERSION_CODENAME=noble\n',
+  );
   fs = write(fs, `${HOME}/README.txt`, README);
   fs = write(fs, `${HOME}/Documents/notes.md`, NOTES);
   fs = write(fs, `${HOME}/Documents/hello.py`, HELLO_PY);

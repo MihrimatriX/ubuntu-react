@@ -1,5 +1,23 @@
 import { describe, expect, test } from "bun:test";
-import { HOME, TRASH, cp, emptyTrash, list, mkdir, mv, read, resolve, restore, rm, stat, trash, trashed, write, mimeOf, uniqueName } from "../src/os/fs";
+import {
+  HOME,
+  TRASH,
+  cp,
+  emptyTrash,
+  list,
+  mkdir,
+  mv,
+  read,
+  resolve,
+  restore,
+  rm,
+  stat,
+  trash,
+  trashed,
+  write,
+  mimeOf,
+  uniqueName,
+} from "../src/os/fs";
 import { seedFs } from "../src/os/seed";
 
 const base = () => seedFs();

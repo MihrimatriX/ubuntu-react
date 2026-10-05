@@ -36,4 +36,6 @@ const html = await Bun.file("./dist/index.html").text();
 writes.push(Bun.write("./dist/index.html", html.replaceAll("%SITE_URL%", SITE_URL)));
 writes.push(Bun.write("./dist/og.png", Bun.file("./public/og.png")));
 await Promise.all(writes);
-console.log(`built ${result.outputs.length} files${SITE_URL ? ` for ${SITE_URL}` : " (set SITE_URL for absolute social preview URLs)"}`);
+console.log(
+  `built ${result.outputs.length} files${SITE_URL ? ` for ${SITE_URL}` : " (set SITE_URL for absolute social preview URLs)"}`,
+);

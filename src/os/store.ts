@@ -11,37 +11,111 @@ import { createStorage } from "./storage";
 import { createWindowSlice, type WindowSlice } from "./windows";
 
 export const ACCENTS: Record<string, string> = {
-  Orange: "#E95420", Bark: "#787859", Sage: "#657B69", Olive: "#4B8501", Viridian: "#03875B",
-  Prussian: "#308280", Blue: "#0073E5", Purple: "#7764D8", Magenta: "#B34CB3", Red: "#DA3450",
+  Orange: "#E95420",
+  Bark: "#787859",
+  Sage: "#657B69",
+  Olive: "#4B8501",
+  Viridian: "#03875B",
+  Prussian: "#308280",
+  Blue: "#0073E5",
+  Purple: "#7764D8",
+  Magenta: "#B34CB3",
+  Red: "#DA3450",
 };
 
 /** Simulated radios: Wi-Fi networks (name, signal 0-3, secured) and paired Bluetooth devices. */
-export const NETWORKS: [string, number, boolean][] = [["Ubuntu-Home", 3, true], ["Noble-5G", 2, true], ["Cafe Free WiFi", 1, false]];
-export const WORLD_CITIES = [["Istanbul", "Europe/Istanbul"], ["London", "Europe/London"], ["New York", "America/New_York"], ["Tokyo", "Asia/Tokyo"], ["Sydney", "Australia/Sydney"]] as const;
+export const NETWORKS: [string, number, boolean][] = [
+  ["Ubuntu-Home", 3, true],
+  ["Noble-5G", 2, true],
+  ["Cafe Free WiFi", 1, false],
+];
+export const WORLD_CITIES = [
+  ["Istanbul", "Europe/Istanbul"],
+  ["London", "Europe/London"],
+  ["New York", "America/New_York"],
+  ["Tokyo", "Asia/Tokyo"],
+  ["Sydney", "Australia/Sydney"],
+] as const;
 export const BT_DEVICES = ["WH-1000XM4 Headphones", "MX Keys Keyboard", "Pixel 8"];
+export const POWER_MODES = { performance: "Performance", balanced: "Balanced", "power-saver": "Power Saver" } as const;
+
+/** `list` with `item` removed if present, appended otherwise (pins, Bluetooth devices, Ctrl+click selection). */
+export const toggle = <T>(list: T[], item: T) =>
+  list.includes(item) ? list.filter((other) => other !== item) : [...list, item];
 
 export type Settings = {
-  theme: "light" | "dark"; accent: string; wallpaper: string;
-  dockPosition: DockPosition; dockIconSize: number; dockAutohide: boolean; dockPanel: boolean; dockTrash: boolean; pinned: string[];
-  desktopIconSize: number; showHome: boolean; showTrash: boolean; hotCorner: boolean; powerMode: "performance" | "balanced" | "power-saver";
-  wifiNetwork: string; btConnected: string[]; blankMinutes: number; lockNotifications: boolean;
-  clock24: boolean; volume: number; brightness: number;
-  wifi: boolean; bluetooth: boolean; nightLight: boolean; dnd: boolean; deviceName: string; starred: string[];
+  theme: "light" | "dark";
+  accent: string;
+  wallpaper: string;
+  dockPosition: DockPosition;
+  dockIconSize: number;
+  dockAutohide: boolean;
+  dockPanel: boolean;
+  dockTrash: boolean;
+  pinned: string[];
+  desktopIconSize: number;
+  showHome: boolean;
+  showTrash: boolean;
+  hotCorner: boolean;
+  powerMode: keyof typeof POWER_MODES;
+  wifiNetwork: string;
+  btConnected: string[];
+  blankMinutes: number;
+  lockNotifications: boolean;
+  clock24: boolean;
+  volume: number;
+  brightness: number;
+  wifi: boolean;
+  bluetooth: boolean;
+  nightLight: boolean;
+  dnd: boolean;
+  deviceName: string;
+  starred: string[];
 };
 
 const defaultSettings = (): Settings => ({
-  theme: "light", accent: ACCENTS.Orange!, wallpaper: WALLPAPERS[0]!.url,
-  dockPosition: "left", dockIconSize: 48, dockAutohide: false, dockPanel: true, dockTrash: false,
-  desktopIconSize: 48, showHome: true, showTrash: true, hotCorner: true, powerMode: "balanced",
-  wifiNetwork: "Ubuntu-Home", btConnected: [], blankMinutes: 5, lockNotifications: true, pinned: APPS.filter((app) => app.pinned).map((app) => app.id),
-  clock24: true, volume: 60, brightness: 100, wifi: true, bluetooth: false, nightLight: false, dnd: false, deviceName: "ubuntu", starred: [],
+  theme: "light",
+  accent: ACCENTS.Orange!,
+  wallpaper: WALLPAPERS[0]!.url,
+  dockPosition: "left",
+  dockIconSize: 48,
+  dockAutohide: false,
+  dockPanel: true,
+  dockTrash: false,
+  desktopIconSize: 48,
+  showHome: true,
+  showTrash: true,
+  hotCorner: true,
+  powerMode: "balanced",
+  wifiNetwork: "Ubuntu-Home",
+  btConnected: [],
+  blankMinutes: 5,
+  lockNotifications: true,
+  pinned: APPS.filter((app) => app.pinned).map((app) => app.id),
+  clock24: true,
+  volume: 60,
+  brightness: 100,
+  wifi: true,
+  bluetooth: false,
+  nightLight: false,
+  dnd: false,
+  deviceName: "ubuntu",
+  starred: [],
 });
 
-export type Note = { id: number; title: string; body?: string; icon?: string; time: number; action?: { label: string; run: () => void } };
+export type Note = {
+  id: number;
+  title: string;
+  body?: string;
+  icon?: string;
+  time: number;
+  action?: { label: string; run: () => void };
+};
 export type Session = "boot" | "login" | "desktop" | "off";
 type Overlay = "none" | "overview" | "grid";
 type Clipboard = { paths: string[]; cut: boolean } | null;
-export type MenuItem = { label: string; action?: () => void; disabled?: boolean; checked?: boolean; shortcut?: string } | "separator";
+export type MenuItem =
+  { label: string; action?: () => void; disabled?: boolean; checked?: boolean; shortcut?: string } | "separator";
 export type Menu = { x: number; y: number; items: MenuItem[] } | null;
 
 type CoreSlice = {
@@ -110,7 +184,8 @@ export const useOS = create<OSState>()(
       clearNotes: () => set({ notes: [], toasts: [] }),
       session: "boot",
       locked: false,
-      setSession: (session) => set({ session, overlay: "none", ...(session === "desktop" ? {} : { windows: [], workspace: 0 }) }),
+      setSession: (session) =>
+        set({ session, overlay: "none", ...(session === "desktop" ? {} : { windows: [], workspace: 0 }) }),
       setLocked: (locked) => set({ locked, overlay: "none" }),
       overlay: "none",
       setOverlay: (overlay) => set({ overlay }),
@@ -138,18 +213,34 @@ export const useOS = create<OSState>()(
       openWith: null,
       setOpenWith: (openWith) => set({ openWith }),
       iconPositions: {},
-      setIconPosition: (path, position) => set((state) => ({ iconPositions: { ...state.iconPositions, [path]: position } })),
+      setIconPosition: (path, position) =>
+        set((state) => ({ iconPositions: { ...state.iconPositions, [path]: position } })),
       resetSystem: () =>
-        set({ fs: seedFs(), settings: defaultSettings(), termHistory: [], hintShown: false, iconPositions: {}, notes: [], toasts: [] }),
+        set({
+          fs: seedFs(),
+          settings: defaultSettings(),
+          termHistory: [],
+          hintShown: false,
+          iconPositions: {},
+          notes: [],
+          toasts: [],
+        }),
     }),
     {
       name: "ubuntu-react",
       version: 1,
       storage: createStorage<Persisted>((chars) =>
-        notify({ title: "Storage almost full", body: `Using ${(chars / 1048576).toFixed(1)} MB of ~5 MB. Delete large files or empty the Trash.` }),
+        notify({
+          title: "Storage almost full",
+          body: `Using ${(chars / 1048576).toFixed(1)} MB of ~5 MB. Delete large files or empty the Trash.`,
+        }),
       ),
       partialize: (state): Persisted => ({
-        fs: state.fs, settings: state.settings, termHistory: state.termHistory, hintShown: state.hintShown, iconPositions: state.iconPositions,
+        fs: state.fs,
+        settings: state.settings,
+        termHistory: state.termHistory,
+        hintShown: state.hintShown,
+        iconPositions: state.iconPositions,
       }),
       // ponytail: no older schema exists yet; unknown versions fall back to a fresh install.
       migrate: (persisted, version) => (version === 1 ? (persisted as Persisted) : ({} as Persisted)),

@@ -10,24 +10,50 @@ import { openPath } from "../../os/launch";
 import { useOS } from "../../os/store";
 
 const THEME = {
-  background: "#300a24", foreground: "#ffffff", cursor: "#ffffff", selectionBackground: "#b5d5ff66",
-  black: "#171421", red: "#c01c28", green: "#26a269", yellow: "#a2734c", blue: "#12488b", magenta: "#a347ba", cyan: "#2aa1b3", white: "#d0cfcc",
-  brightBlack: "#5e5c64", brightRed: "#f66151", brightGreen: "#33da7a", brightYellow: "#e9ad0c", brightBlue: "#2a7bde",
-  brightMagenta: "#c061cb", brightCyan: "#33c7de", brightWhite: "#ffffff",
+  background: "#300a24",
+  foreground: "#ffffff",
+  cursor: "#ffffff",
+  selectionBackground: "#b5d5ff66",
+  black: "#171421",
+  red: "#c01c28",
+  green: "#26a269",
+  yellow: "#a2734c",
+  blue: "#12488b",
+  magenta: "#a347ba",
+  cyan: "#2aa1b3",
+  white: "#d0cfcc",
+  brightBlack: "#5e5c64",
+  brightRed: "#f66151",
+  brightGreen: "#33da7a",
+  brightYellow: "#e9ad0c",
+  brightBlue: "#2a7bde",
+  brightMagenta: "#c061cb",
+  brightCyan: "#33c7de",
+  brightWhite: "#ffffff",
 };
 const SUDO_MS = 15 * 60_000;
 const startedAt = Date.now();
 let sudoUntil = 0;
 
 export class TermSession {
-  readonly term = new Terminal({ fontFamily: '"Ubuntu Mono", monospace', fontSize: 15, cursorBlink: true, theme: THEME, allowProposedApi: true });
+  readonly term = new Terminal({
+    fontFamily: '"Ubuntu Mono", monospace',
+    fontSize: 15,
+    cursorBlink: true,
+    theme: THEME,
+    allowProposedApi: true,
+  });
   private fit = new FitAddon();
   private line = "";
   private cursor = 0;
   private historyIndex = -1;
   private sudoCommand: string | null = null;
 
-  constructor(host: HTMLElement, public cwd: string, private hooks: { onTitle: (title: string) => void; onExit: () => void }) {
+  constructor(
+    host: HTMLElement,
+    public cwd: string,
+    private hooks: { onTitle: (title: string) => void; onExit: () => void },
+  ) {
     this.term.loadAddon(this.fit);
     this.term.open(host);
     this.useWebgl();
@@ -73,7 +99,9 @@ export class TermSession {
    */
   private redraw(line: string, cursor = line.length) {
     const back = this.cursor;
-    this.term.write(`${back ? `\x1b[${back}D` : ""}\x1b[K${line}${line.length - cursor ? `\x1b[${line.length - cursor}D` : ""}`);
+    this.term.write(
+      `${back ? `\x1b[${back}D` : ""}\x1b[K${line}${line.length - cursor ? `\x1b[${line.length - cursor}D` : ""}`,
+    );
     this.line = line;
     this.cursor = cursor;
   }
@@ -88,14 +116,24 @@ export class TermSession {
       "\x1b[3~": () => this.redraw(line.slice(0, cursor) + line.slice(cursor + 1), cursor),
       "\x1b[D": () => cursor && this.redraw(line, cursor - 1),
       "\x1b[C": () => cursor < line.length && this.redraw(line, cursor + 1),
-      "\x1b[H": () => this.redraw(line, 0), "\x01": () => this.redraw(line, 0),
-      "\x1b[F": () => this.redraw(line, line.length), "\x05": () => this.redraw(line, line.length),
+      "\x1b[H": () => this.redraw(line, 0),
+      "\x01": () => this.redraw(line, 0),
+      "\x1b[F": () => this.redraw(line, line.length),
+      "\x05": () => this.redraw(line, line.length),
       "\x15": () => this.redraw(line.slice(cursor), 0),
       "\x1b[A": () => this.browseHistory(history, 1),
       "\x1b[B": () => this.browseHistory(history, -1),
       "\t": () => this.tab(),
-      "\x03": () => { this.term.write("^C\r\n"); this.prompt(); },
-      "\x0c": () => { this.term.clear(); this.term.write("\x1b[H\x1b[2J"); this.prompt(); this.redraw(line, cursor); },
+      "\x03": () => {
+        this.term.write("^C\r\n");
+        this.prompt();
+      },
+      "\x0c": () => {
+        this.term.clear();
+        this.term.write("\x1b[H\x1b[2J");
+        this.prompt();
+        this.redraw(line, cursor);
+      },
     };
     const handler = keys[data];
     if (handler) return void handler();
@@ -105,7 +143,7 @@ export class TermSession {
 
   private browseHistory(history: string[], step: number) {
     const index = Math.min(Math.max(this.historyIndex + step, -1), history.length - 1);
-    this.redraw(index === -1 ? "" : history[history.length - 1 - index] ?? "");
+    this.redraw(index === -1 ? "" : (history[history.length - 1 - index] ?? ""));
     this.historyIndex = index;
   }
 
@@ -148,7 +186,14 @@ export class TermSession {
 
   private execute(input: string) {
     const os = useOS.getState();
-    const env = { user: "ubuntu", host: os.settings.deviceName, startedAt, resolution: `${innerWidth}x${innerHeight}`, cores: navigator.hardwareConcurrency || 4, windows: os.windows.length };
+    const env = {
+      user: "ubuntu",
+      host: os.settings.deviceName,
+      startedAt,
+      resolution: `${innerWidth}x${innerHeight}`,
+      cores: navigator.hardwareConcurrency || 4,
+      windows: os.windows.length,
+    };
     const result = run(input, { fs: os.fs, cwd: this.cwd, history: os.termHistory, env });
     if (result.fs !== os.fs) os.updateFs(() => result.fs);
     this.cwd = result.cwd;

@@ -4,7 +4,9 @@ import { createRoot, type Root } from "react-dom/client";
 import { useOS } from "../src/os/store";
 import { Desktop } from "../src/shell/Desktop";
 
-declare global { var IS_REACT_ACT_ENVIRONMENT: boolean }
+declare global {
+  var IS_REACT_ACT_ENVIRONMENT: boolean;
+}
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 let root: Root;
@@ -48,9 +50,16 @@ test("minimize keeps the window mounted; dock click cycle restores and re-minimi
 });
 
 test("dock context menu Quit closes every window of the app", async () => {
-  await act(() => { useOS.getState().openApp("terminal"); useOS.getState().openApp("terminal"); });
+  await act(() => {
+    useOS.getState().openApp("terminal");
+    useOS.getState().openApp("terminal");
+  });
   expect($$('[data-dock-app="terminal"] i')).toHaveLength(2);
-  await act(() => { $('[data-dock-app="terminal"]')!.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, clientX: 10, clientY: 10 })); });
+  await act(() => {
+    $('[data-dock-app="terminal"]')!.dispatchEvent(
+      new MouseEvent("contextmenu", { bubbles: true, clientX: 10, clientY: 10 }),
+    );
+  });
   const quit = [...$$('[role="menuitem"]')].find((item) => item.textContent?.includes("Quit"));
   await click(quit!);
   expect(useOS.getState().windows).toHaveLength(0);

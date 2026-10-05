@@ -3,31 +3,46 @@
 
 export class CalcError extends Error {}
 
-type Token = { kind: "num"; value: number } | { kind: "op"; value: string } | { kind: "fn"; value: string } | { kind: "paren"; value: "(" | ")" };
+type Token =
+  | { kind: "num"; value: number }
+  | { kind: "op"; value: string }
+  | { kind: "fn"; value: string }
+  | { kind: "paren"; value: "(" | ")" };
 
 const FUNCTIONS: Record<string, (x: number, degrees: boolean) => number> = {
   sin: (x, deg) => Math.sin(deg ? (x * Math.PI) / 180 : x),
   cos: (x, deg) => Math.cos(deg ? (x * Math.PI) / 180 : x),
   tan: (x, deg) => Math.tan(deg ? (x * Math.PI) / 180 : x),
-  sqrt: (x) => Math.sqrt(x), "√": (x) => Math.sqrt(x),
-  ln: (x) => Math.log(x), log: (x) => Math.log10(x), abs: (x) => Math.abs(x),
+  sqrt: (x) => Math.sqrt(x),
+  "√": (x) => Math.sqrt(x),
+  ln: (x) => Math.log(x),
+  log: (x) => Math.log10(x),
+  abs: (x) => Math.abs(x),
 };
-const CONSTANTS: Record<string, number> = { "π": Math.PI, pi: Math.PI, e: Math.E };
+const CONSTANTS: Record<string, number> = { π: Math.PI, pi: Math.PI, e: Math.E };
 // [precedence, right-associative, arity]
 const OPERATORS: Record<string, [number, boolean, number]> = {
-  "+": [1, false, 2], "-": [1, false, 2], "*": [2, false, 2], "/": [2, false, 2],
-  "neg": [3, true, 1], "^": [4, true, 2], "!": [5, false, 1], "%": [5, false, 1],
+  "+": [1, false, 2],
+  "-": [1, false, 2],
+  "*": [2, false, 2],
+  "/": [2, false, 2],
+  neg: [3, true, 1],
+  "^": [4, true, 2],
+  "!": [5, false, 1],
+  "%": [5, false, 1],
 };
 
 export function tokenize(input: string): Token[] {
   const source = input.replace(/×/g, "*").replace(/÷/g, "/").replace(/−/g, "-").replace(/\s+/g, "");
   const tokens: Token[] = [];
-  for (let index = 0; index < source.length; ) {
+  for (let index = 0; index < source.length;) {
     const rest = source.slice(index);
     const number = rest.match(/^(\d+\.?\d*|\.\d+)(e[+-]?\d+)?/);
     const word = rest.match(/^(sqrt|sin|cos|tan|ln|log|abs|pi|π|√|e)/);
     const previous = tokens.at(-1);
-    const afterOperand = previous && (previous.kind === "num" || previous.value === ")" || previous.value === "!" || previous.value === "%");
+    const afterOperand =
+      previous &&
+      (previous.kind === "num" || previous.value === ")" || previous.value === "!" || previous.value === "%");
     if (number) {
       if (afterOperand) tokens.push({ kind: "op", value: "*" });
       tokens.push({ kind: "num", value: Number(number[0]) });
@@ -65,7 +80,10 @@ function toRpn(tokens: Token[]): Token[] {
       const [precedence, rightAssoc] = OPERATORS[token.value]!;
       while (stack.length) {
         const top = stack.at(-1)!;
-        if (top.kind === "fn") { output.push(stack.pop()!); continue; }
+        if (top.kind === "fn") {
+          output.push(stack.pop()!);
+          continue;
+        }
         if (top.kind !== "op") break;
         const [topPrecedence] = OPERATORS[top.value]!;
         if (topPrecedence > precedence || (topPrecedence === precedence && !rightAssoc)) output.push(stack.pop()!);
@@ -92,14 +110,23 @@ const factorial = (n: number) => {
 function apply(op: string, args: number[]): number {
   const [a = 0, b = 0] = args;
   switch (op) {
-    case "+": return a + b;
-    case "-": return a - b;
-    case "*": return a * b;
-    case "/": if (b === 0) throw new CalcError("Division by zero is undefined"); return a / b;
-    case "^": return a ** b;
-    case "neg": return -a;
-    case "!": return factorial(a);
-    default: return a / 100; // "%"
+    case "+":
+      return a + b;
+    case "-":
+      return a - b;
+    case "*":
+      return a * b;
+    case "/":
+      if (b === 0) throw new CalcError("Division by zero is undefined");
+      return a / b;
+    case "^":
+      return a ** b;
+    case "neg":
+      return -a;
+    case "!":
+      return factorial(a);
+    default:
+      return a / 100; // "%"
   }
 }
 
@@ -116,7 +143,8 @@ export function evaluate(input: string, options: { degrees?: boolean } = {}): nu
       stack.push(apply(token.value, stack.splice(-arity)));
     }
   }
-  if (stack.length !== 1 || !Number.isFinite(stack[0])) throw new CalcError(stack.length ? "Result is not a finite number" : "Malformed expression");
+  if (stack.length !== 1 || !Number.isFinite(stack[0]))
+    throw new CalcError(stack.length ? "Result is not a finite number" : "Malformed expression");
   return stack[0]!;
 }
 

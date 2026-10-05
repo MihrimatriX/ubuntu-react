@@ -22,18 +22,28 @@ export function takeScreenshot(): void {
   const stamp = new Date().toISOString().slice(0, 19).replace("T", " ").replace(/:/g, "-");
   const path = `${HOME}/Pictures/Screenshots/Screenshot from ${stamp}.png`;
   const saved = tryFs((fs) => write(mkdir(fs, dirname(path), true), path, os.settings.wallpaper), "Screenshot");
-  if (saved) notify({ title: "Screenshot captured", body: path.slice(HOME.length + 1), icon: ICONS["image-viewer"], action: { label: "Show in Files", run: () => openPath(dirname(path)) } });
+  if (saved)
+    notify({
+      title: "Screenshot captured",
+      body: path.slice(HOME.length + 1),
+      icon: ICONS["image-viewer"],
+      action: { label: "Show in Files", run: () => openPath(dirname(path)) },
+    });
 }
 
 /** Pastes the clipboard into `dir`: copies get a unique name, cuts are moved and clear the clipboard. */
 export function pasteInto(dir: string): void {
   const { clipboard, setClipboard } = useOS.getState();
   if (!clipboard) return;
-  const ok = tryFs((fs) =>
-    clipboard.paths.reduce((next, src) => {
-      if (clipboard.cut) return dirname(src) === dir ? next : mv(next, src, `${dir}/${uniqueName(next, dir, basename(src))}`);
-      return cp(next, src, `${dir}/${uniqueName(next, dir, basename(src))}`, true);
-    }, fs), "Paste");
+  const ok = tryFs(
+    (fs) =>
+      clipboard.paths.reduce((next, src) => {
+        if (clipboard.cut)
+          return dirname(src) === dir ? next : mv(next, src, `${dir}/${uniqueName(next, dir, basename(src))}`);
+        return cp(next, src, `${dir}/${uniqueName(next, dir, basename(src))}`, true);
+      }, fs),
+    "Paste",
+  );
   if (ok && clipboard.cut) setClipboard(null);
 }
 
@@ -48,7 +58,11 @@ export function createIn(dir: string, kind: "dir" | "file"): string | undefined 
 export function renamePath(path: string, name: string): boolean {
   const trimmed = name.trim();
   const target = `${dirname(path) === "/" ? "" : dirname(path)}/${trimmed}`;
-  const problem = trimmed.includes("/") ? "File names cannot contain “/”." : useOS.getState().fs[target] ? `“${trimmed}” already exists.` : "";
+  const problem = trimmed.includes("/")
+    ? "File names cannot contain “/”."
+    : useOS.getState().fs[target]
+      ? `“${trimmed}” already exists.`
+      : "";
   if (!trimmed || trimmed === basename(path)) return false;
   if (problem) {
     notify({ title: "Rename failed", body: problem });

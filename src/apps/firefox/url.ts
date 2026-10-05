@@ -7,7 +7,10 @@ export const SEARCH_URL = "https://html.duckduckgo.com/html/?q=";
 /** Sites that load inside an <iframe> (no X-Frame-Options / frame-ancestors). */
 export const EMBEDDABLE = [
   { title: "Wikipedia", url: "https://en.wikipedia.org/wiki/Ubuntu" },
-  { title: "OpenStreetMap", url: "https://www.openstreetmap.org/export/embed.html?bbox=28.9,41.0,29.1,41.1&layer=mapnik" },
+  {
+    title: "OpenStreetMap",
+    url: "https://www.openstreetmap.org/export/embed.html?bbox=28.9,41.0,29.1,41.1&layer=mapnik",
+  },
   { title: "DuckDuckGo", url: "https://html.duckduckgo.com/html/" },
   { title: "Ubuntu Wiki", url: "https://wiki.ubuntu.com" },
   { title: "Internet Archive", url: "https://archive.org" },
@@ -17,15 +20,31 @@ export const EMBEDDABLE = [
 ];
 
 const BLOCKED_HOSTS = [
-  "google.", "github.com", "kernel.org", "developer.mozilla.org", "gnu.org", "ubuntu.com", "duckduckgo.com", "neal.fun",
-  "youtube.com", "facebook.com", "x.com", "twitter.com", "instagram.com", "reddit.com", "stackoverflow.com", "amazon.", "linkedin.com",
+  "google.",
+  "github.com",
+  "kernel.org",
+  "developer.mozilla.org",
+  "gnu.org",
+  "ubuntu.com",
+  "duckduckgo.com",
+  "neal.fun",
+  "youtube.com",
+  "facebook.com",
+  "x.com",
+  "twitter.com",
+  "instagram.com",
+  "reddit.com",
+  "stackoverflow.com",
+  "amazon.",
+  "linkedin.com",
 ];
 
 export function normalizeUrl(input: string): string {
   const text = input.trim();
   if (!text) return HOME_URL;
   if (/^(https?:|about:)/i.test(text)) return text;
-  const looksLikeHost = !/\s/.test(text) && (/^[\w-]+(\.[\w-]+)+(:\d+)?(\/.*)?$/.test(text) || /^localhost(:\d+)?/.test(text));
+  const looksLikeHost =
+    !/\s/.test(text) && (/^[\w-]+(\.[\w-]+)+(:\d+)?(\/.*)?$/.test(text) || /^localhost(:\d+)?/.test(text));
   return looksLikeHost ? `https://${text}` : SEARCH_URL + encodeURIComponent(text);
 }
 
@@ -38,7 +57,9 @@ export function isBlocked(url: string): boolean {
     return false;
   }
   if (host === "html.duckduckgo.com" || host.endsWith("wikipedia.org")) return false;
-  return BLOCKED_HOSTS.some((blocked) => (blocked.endsWith(".") ? host.includes(blocked) : host === blocked || host.endsWith(`.${blocked}`)));
+  return BLOCKED_HOSTS.some((blocked) =>
+    blocked.endsWith(".") ? host.includes(blocked) : host === blocked || host.endsWith(`.${blocked}`),
+  );
 }
 
 export const hostOf = (url: string) => {

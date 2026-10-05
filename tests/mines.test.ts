@@ -1,7 +1,8 @@
 import { expect, test } from "bun:test";
 import { emptyBoard, lost, placeMines, reveal, toggleFlag, won } from "../src/lib/mines";
 
-const count = (board: ReturnType<typeof emptyBoard>, key: "mine" | "open") => board.flat().filter((cell) => cell[key]).length;
+const count = (board: ReturnType<typeof emptyBoard>, key: "mine" | "open") =>
+  board.flat().filter((cell) => cell[key]).length;
 
 test("first click and its neighbours are never mines", () => {
   for (let i = 0; i < 50; i++) {

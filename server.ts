@@ -12,7 +12,12 @@ Bun.serve({
     if (path.includes("..")) return new Response("Bad Request", { status: 400 }); // %2f-encoded traversal
     const file = Bun.file(ROOT + (path === "/" ? "/index.html" : path));
     if (!(await file.exists())) return new Response("Not Found", { status: 404 });
-    const headers = { ...SECURITY, "Content-Type": file.type, "Cache-Control": HASHED.test(path) ? "public, max-age=31536000, immutable" : "no-cache", Vary: "Accept-Encoding" };
+    const headers = {
+      ...SECURITY,
+      "Content-Type": file.type,
+      "Cache-Control": HASHED.test(path) ? "public, max-age=31536000, immutable" : "no-cache",
+      Vary: "Accept-Encoding",
+    };
     const gzip = Bun.file(`${file.name}.gz`);
     if (request.headers.get("accept-encoding")?.includes("gzip") && (await gzip.exists())) {
       return new Response(gzip, { headers: { ...headers, "Content-Encoding": "gzip" } });

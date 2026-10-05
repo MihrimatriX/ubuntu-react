@@ -21,19 +21,38 @@ function OpenWith() {
   const close = () => useOS.getState().setOpenWith(null);
   if (!path) return null;
   return (
-    <div className="fixed inset-0 z-[8500] grid place-items-center bg-black/40" onPointerDown={close} onKeyDown={(e) => e.key === "Escape" && close()}>
-      <div role="dialog" aria-label="Open With" className="anim-pop w-96 rounded-2xl bg-popover p-4 text-fg shadow-2xl" onPointerDown={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-[8500] grid place-items-center bg-black/40"
+      onPointerDown={close}
+      onKeyDown={(e) => e.key === "Escape" && close()}
+    >
+      <div
+        role="dialog"
+        aria-label="Open With"
+        className="anim-pop w-96 rounded-2xl bg-popover p-4 text-fg shadow-2xl"
+        onPointerDown={(e) => e.stopPropagation()}
+      >
         <h3 className="text-center font-bold">Open “{basename(path)}”</h3>
         <p className="mb-3 text-center text-sm text-fg-dim">Choose an application</p>
         <div className="flex max-h-80 flex-col overflow-y-auto">
           {APPS.map((app, index) => (
-            <button key={app.id} autoFocus={index === 0} className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-hover focus:bg-hover"
-              onClick={() => { close(); openPath(path, app.id); }}>
-              <img src={app.icon} alt="" className="size-8" />{app.name}
+            <button
+              key={app.id}
+              autoFocus={index === 0}
+              className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-hover focus:bg-hover"
+              onClick={() => {
+                close();
+                openPath(path, app.id);
+              }}
+            >
+              <img src={app.icon} alt="" className="size-8" />
+              {app.name}
             </button>
           ))}
         </div>
-        <button className="btn mt-3 w-full" onClick={close}>Cancel</button>
+        <button className="btn mt-3 w-full" onClick={close}>
+          Cancel
+        </button>
       </div>
     </div>
   );
@@ -72,11 +91,19 @@ export function Desktop() {
   useIdleLock(!locked);
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-black bg-cover bg-center" style={{ backgroundImage: `url("${wallpaper}")` }}>
+    <div
+      className="fixed inset-0 overflow-hidden bg-black bg-cover bg-center"
+      style={{ backgroundImage: `url("${wallpaper}")` }}
+    >
       <DesktopIcons />
       <OverviewBackdrop />
-      <div className="pointer-events-none absolute inset-0 transition-transform duration-250 ease-out" style={{ transform: `translateX(${-workspace * 100}vw)` }}>
-        {windows.map((win) => <Window key={win.id} win={win} />)}
+      <div
+        className="pointer-events-none absolute inset-0 transition-transform duration-250 ease-out"
+        style={{ transform: `translateX(${-workspace * 100}vw)` }}
+      >
+        {windows.map((win) => (
+          <Window key={win.id} win={win} />
+        ))}
       </div>
       <Overview />
       <AppGrid />
@@ -87,8 +114,13 @@ export function Desktop() {
       <Notifications />
       <OpenWith />
       <ContextMenu />
-      {nightLight && <div className="pointer-events-none fixed inset-0 z-[9500] bg-[#ff9329] opacity-20 mix-blend-multiply" />}
-      <div className="pointer-events-none fixed inset-0 z-[9500] bg-black" style={{ opacity: (1 - brightness / 100) * 0.8 }} />
+      {nightLight && (
+        <div className="pointer-events-none fixed inset-0 z-[9500] bg-[#ff9329] opacity-20 mix-blend-multiply" />
+      )}
+      <div
+        className="pointer-events-none fixed inset-0 z-[9500] bg-black"
+        style={{ opacity: (1 - brightness / 100) * 0.8 }}
+      />
     </div>
   );
 }

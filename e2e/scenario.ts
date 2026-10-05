@@ -11,7 +11,10 @@ function check(condition: unknown, message: string) {
 }
 
 const readFile = (page: Page, path: string) =>
-  page.evaluate((file) => JSON.parse(localStorage.getItem("ubuntu-react")!).state.fs[file]?.content as string | undefined, path);
+  page.evaluate(
+    (file) => JSON.parse(localStorage.getItem("ubuntu-react")!).state.fs[file]?.content as string | undefined,
+    path,
+  );
 
 const browser = await chromium.launch({ channel: "chrome" });
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
@@ -20,7 +23,10 @@ page.on("pageerror", (error) => errors.push(error.message));
 try {
   await page.goto(URL);
   check(await page.getByLabel("Booting").isVisible(), "boot splash is shown");
-  await page.getByRole("button", { name: /ubuntu/ }).first().click({ timeout: 8000 });
+  await page
+    .getByRole("button", { name: /ubuntu/ })
+    .first()
+    .click({ timeout: 8000 });
   await page.getByLabel("Password").fill("anything");
   await page.keyboard.press("Enter");
   await page.waitForSelector('[aria-label="Dock"]');
@@ -34,7 +40,10 @@ try {
 
   await page.locator('[data-dock-app="files"]').click();
   await page.locator('[data-path="/home/ubuntu/test"]').dblclick();
-  check(await page.locator('[data-path="/home/ubuntu/test/a.txt"]').isVisible(), "a.txt created in Terminal is visible in Files");
+  check(
+    await page.locator('[data-path="/home/ubuntu/test/a.txt"]').isVisible(),
+    "a.txt created in Terminal is visible in Files",
+  );
 
   await page.locator('[data-path="/home/ubuntu/test/a.txt"]').dblclick();
   const editor = page.locator('[data-window^="text-editor"]');
@@ -54,7 +63,10 @@ try {
   await page.keyboard.type("cat a.txt > copy.txt\n");
   await page.waitForTimeout(400);
   check((await readFile(page, "/home/ubuntu/test/a.txt")) === "hi\n from the editor", "the edit is saved to the VFS");
-  check((await readFile(page, "/home/ubuntu/test/copy.txt")) === "hi\n from the editor", "cat in Terminal reads the saved content");
+  check(
+    (await readFile(page, "/home/ubuntu/test/copy.txt")) === "hi\n from the editor",
+    "cat in Terminal reads the saved content",
+  );
   check(errors.length === 0, `no page errors${errors.length ? `: ${errors.join("; ")}` : ""}`);
 } finally {
   await browser.close();

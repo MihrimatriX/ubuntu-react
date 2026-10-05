@@ -5,8 +5,11 @@ import { SHORTCUTS, comboOf } from "../src/os/keyboard";
 import { seedFs } from "../src/os/seed";
 import { searchAll } from "../src/shell/Overview";
 
-const key = (code: string, mods: Partial<Record<"ctrlKey" | "metaKey" | "altKey" | "shiftKey", boolean>> = {}, value = "") =>
-  comboOf({ code, key: value, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...mods });
+const key = (
+  code: string,
+  mods: Partial<Record<"ctrlKey" | "metaKey" | "altKey" | "shiftKey", boolean>> = {},
+  value = "",
+) => comboOf({ code, key: value, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...mods });
 
 test("comboOf normalizes physical keys in a fixed modifier order", () => {
   expect(key("KeyT", { ctrlKey: true, altKey: true })).toBe("Ctrl+Alt+T");

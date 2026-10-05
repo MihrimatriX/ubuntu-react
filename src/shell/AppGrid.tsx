@@ -19,7 +19,10 @@ export function AppGrid() {
   const pages = Math.max(1, Math.ceil(APPS.length / (columns * rows)));
   const turn = (step: number) => setPage((current) => Math.min(pages - 1, Math.max(0, current + step)));
 
-  useEffect(() => { setPage(0); setQuery(""); }, [open]);
+  useEffect(() => {
+    setPage(0);
+    setQuery("");
+  }, [open]);
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
@@ -33,23 +36,46 @@ export function AppGrid() {
 
   if (!open) return null;
   return (
-    <div className="anim-pop absolute inset-x-0 bottom-0 top-8 z-[4000] flex flex-col bg-[#1d1d1d]/90 pt-4 text-white backdrop-blur-xl"
-      onClick={(e) => e.target === e.currentTarget && close()} onWheel={(e) => turn(e.deltaY > 0 ? 1 : -1)}>
+    <div
+      className="anim-pop absolute inset-x-0 bottom-0 top-8 z-[4000] flex flex-col bg-[#1d1d1d]/90 pt-4 text-white backdrop-blur-xl"
+      onClick={(e) => e.target === e.currentTarget && close()}
+      onWheel={(e) => turn(e.deltaY > 0 ? 1 : -1)}
+    >
       <SearchField query={query} setQuery={setQuery} onDone={close} />
-      {query ? <SearchResults query={query} onDone={close} /> : (
+      {query ? (
+        <SearchResults query={query} onDone={close} />
+      ) : (
         <>
-          <div className="m-auto grid gap-2" style={{ gridTemplateColumns: `repeat(${columns}, ${CELL.w}px)` }} onClick={(e) => e.target === e.currentTarget && close()}>
+          <div
+            className="m-auto grid gap-2"
+            style={{ gridTemplateColumns: `repeat(${columns}, ${CELL.w}px)` }}
+            onClick={(e) => e.target === e.currentTarget && close()}
+          >
             {APPS.slice(page * columns * rows, (page + 1) * columns * rows).map((app) => (
-              <button key={app.id} onClick={() => { close(); useOS.getState().openApp(app.id); }}
-                className="flex flex-col items-center justify-center gap-2 rounded-2xl text-sm hover:bg-white/10 focus:bg-white/10" style={{ height: CELL.h }}>
-                <img src={app.icon} alt="" className="size-20" draggable={false} />{app.name}
+              <button
+                key={app.id}
+                onClick={() => {
+                  close();
+                  useOS.getState().openApp(app.id);
+                }}
+                className="flex flex-col items-center justify-center gap-2 rounded-2xl text-sm hover:bg-white/10 focus:bg-white/10"
+                style={{ height: CELL.h }}
+              >
+                <img src={app.icon} alt="" className="size-20" draggable={false} />
+                {app.name}
               </button>
             ))}
           </div>
           <div className="mb-24 flex justify-center gap-3">
-            {pages > 1 && Array.from({ length: pages }, (_, index) => (
-              <button key={index} aria-label={`Page ${index + 1}`} onClick={() => setPage(index)} className={`size-2.5 rounded-full ${index === page ? "bg-white" : "bg-white/30"}`} />
-            ))}
+            {pages > 1 &&
+              Array.from({ length: pages }, (_, index) => (
+                <button
+                  key={index}
+                  aria-label={`Page ${index + 1}`}
+                  onClick={() => setPage(index)}
+                  className={`size-2.5 rounded-full ${index === page ? "bg-white" : "bg-white/30"}`}
+                />
+              ))}
           </div>
         </>
       )}

@@ -13,9 +13,21 @@ const TRASH_INFO = `${TRASH}/info`;
 export class FsError extends Error {}
 
 const MIME: Record<string, string> = {
-  txt: "text/plain", md: "text/markdown", js: "text/javascript", ts: "text/typescript",
-  json: "application/json", html: "text/html", css: "text/css", py: "text/x-python", sh: "text/x-shellscript",
-  png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", gif: "image/gif", svg: "image/svg+xml", webp: "image/webp",
+  txt: "text/plain",
+  md: "text/markdown",
+  js: "text/javascript",
+  ts: "text/typescript",
+  json: "application/json",
+  html: "text/html",
+  css: "text/css",
+  py: "text/x-python",
+  sh: "text/x-shellscript",
+  png: "image/png",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  gif: "image/gif",
+  svg: "image/svg+xml",
+  webp: "image/webp",
 };
 
 export const basename = (path: string) => path.slice(path.lastIndexOf("/") + 1) || "/";
@@ -126,7 +138,11 @@ export function trash(fs: Fs, path: string): Fs {
   fs = mkdir(mkdir(fs, TRASH_FILES, true), TRASH_INFO, true);
   const name = uniqueName(fs, TRASH_FILES, basename(path));
   fs = mv(fs, path, join(TRASH_FILES, name));
-  return write(fs, join(TRASH_INFO, `${name}.trashinfo`), `[Trash Info]\nPath=${path}\nDeletionDate=${new Date().toISOString()}\n`);
+  return write(
+    fs,
+    join(TRASH_INFO, `${name}.trashinfo`),
+    `[Trash Info]\nPath=${path}\nDeletionDate=${new Date().toISOString()}\n`,
+  );
 }
 
 /** Trashed items as { name, originalPath } pairs. */
@@ -148,11 +164,16 @@ export function restore(fs: Fs, name: string): Fs {
 }
 
 export function emptyTrash(fs: Fs): Fs {
-  return Object.fromEntries(Object.entries(fs).filter(([key]) => !key.startsWith(`${TRASH_FILES}/`) && !key.startsWith(`${TRASH_INFO}/`)));
+  return Object.fromEntries(
+    Object.entries(fs).filter(([key]) => !key.startsWith(`${TRASH_FILES}/`) && !key.startsWith(`${TRASH_INFO}/`)),
+  );
 }
 
 /** Every path under `dir` (recursive, excluding `dir` itself). */
-export const walk = (fs: Fs, dir: string) => Object.keys(fs).filter((key) => key !== dir && isInside(key, dir)).sort();
+export const walk = (fs: Fs, dir: string) =>
+  Object.keys(fs)
+    .filter((key) => key !== dir && isInside(key, dir))
+    .sort();
 
 /** Total bytes of file content. */
 export const usage = (fs: Fs) => Object.values(fs).reduce((sum, node) => sum + node.size, 0);

@@ -5,9 +5,7 @@ import { list, resolve, write, type Fs } from "../os/fs";
 import { COMMANDS } from "./commands";
 
 export type Effect =
-  | { type: "open"; appId?: string; path?: string; args?: string[] }
-  | { type: "clear" }
-  | { type: "exit" };
+  { type: "open"; appId?: string; path?: string; args?: string[] } | { type: "clear" } | { type: "exit" };
 
 type ShellEnv = { user: string; host: string; startedAt: number; resolution: string; cores: number; windows: number };
 export type ShellContext = { fs: Fs; cwd: string; history: string[]; env: ShellEnv };
@@ -90,7 +88,15 @@ function runPipeline(pipeline: Simple[], ctx: ShellContext, effects: Effect[]): 
   pipeline.forEach((command, index) => {
     const [name = "", ...args] = command.argv;
     const tty = index === pipeline.length - 1 && !command.redirect;
-    const io: IO = { ctx, stdin, tty, effects, err: (message) => { errors += `${message}\n`; } };
+    const io: IO = {
+      ctx,
+      stdin,
+      tty,
+      effects,
+      err: (message) => {
+        errors += `${message}\n`;
+      },
+    };
     const handler = COMMANDS[name];
     if (!handler) {
       io.err(`Command '${name}' not found`);
@@ -142,16 +148,19 @@ export function complete(line: string, cwd: string, fs: Fs): { line: string; opt
   const commandPosition = !before || /(\||&&|sudo)$/.test(before);
   let candidates: string[];
   if (commandPosition) {
-    candidates = Object.keys(COMMANDS).filter((name) => name.startsWith(word)).sort();
+    candidates = Object.keys(COMMANDS)
+      .filter((name) => name.startsWith(word))
+      .sort();
   } else {
     const dirPart = word.slice(0, word.lastIndexOf("/") + 1);
     const partial = word.slice(dirPart.length);
     const dir = resolve(cwd, dirPart || ".");
-    candidates = fs[dir]?.type === "dir"
-      ? list(fs, dir)
-          .filter((name) => name.startsWith(partial) && (partial.startsWith(".") || !name.startsWith(".")))
-          .map((name) => dirPart + name + (fs[resolve(dir, name)]?.type === "dir" ? "/" : ""))
-      : [];
+    candidates =
+      fs[dir]?.type === "dir"
+        ? list(fs, dir)
+            .filter((name) => name.startsWith(partial) && (partial.startsWith(".") || !name.startsWith(".")))
+            .map((name) => dirPart + name + (fs[resolve(dir, name)]?.type === "dir" ? "/" : ""))
+        : [];
   }
   return applyCompletion(line.slice(0, start), word, candidates);
 }
@@ -160,7 +169,11 @@ export function complete(line: string, cwd: string, fs: Fs): { line: string; opt
  * Decides what Tab does with the matching candidates for `word` (the text before it is `prefix`).
  * Returns the new input line and the options to print below the prompt (empty = print nothing).
  */
-export function applyCompletion(prefix: string, word: string, candidates: string[]): { line: string; options: string[] } {
+export function applyCompletion(
+  prefix: string,
+  word: string,
+  candidates: string[],
+): { line: string; options: string[] } {
   if (!candidates.length) return { line: prefix + word, options: [] };
   if (candidates.length === 1) {
     const only = candidates[0]!;

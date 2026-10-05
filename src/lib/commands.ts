@@ -8,7 +8,8 @@ export function parseFlags(args: string[]) {
   const flags = new Set<string>();
   const rest: string[] = [];
   for (const arg of args) {
-    if (arg.length > 1 && arg.startsWith("-") && !/^-\d+$/.test(arg)) [...arg.slice(1)].forEach((flag) => flags.add(flag));
+    if (arg.length > 1 && arg.startsWith("-") && !/^-\d+$/.test(arg))
+      [...arg.slice(1)].forEach((flag) => flags.add(flag));
     else rest.push(arg);
   }
   return { flags, rest };
@@ -46,11 +47,20 @@ const ls: Command = (args, io) => {
   let code = 0;
   for (const target of targets) {
     const path = at(io, target);
-    if (!attempt(io, `ls: cannot access '${target}'`, () => stat(io.ctx.fs, path))) { code = 2; continue; }
+    if (!attempt(io, `ls: cannot access '${target}'`, () => stat(io.ctx.fs, path))) {
+      code = 2;
+      continue;
+    }
     const node = stat(io.ctx.fs, path);
-    const names = node.type === "dir" ? [...(flags.has("a") ? [".", ".."] : []), ...list(io.ctx.fs, path).filter((n) => flags.has("a") || !n.startsWith("."))] : [target];
+    const names =
+      node.type === "dir"
+        ? [
+            ...(flags.has("a") ? [".", ".."] : []),
+            ...list(io.ctx.fs, path).filter((n) => flags.has("a") || !n.startsWith(".")),
+          ]
+        : [target];
     const entries = names.map((name) => {
-      const child = node.type === "dir" ? io.ctx.fs[resolve(path, name)] ?? node : node;
+      const child = node.type === "dir" ? (io.ctx.fs[resolve(path, name)] ?? node) : node;
       return flags.has("l") ? longLine(io, name, child) : nameColor(io, name, child);
     });
     const body = entries.join(flags.has("l") || !io.tty ? "\n" : "  ");
@@ -73,7 +83,13 @@ const cat: Command = (args, io) => {
   if (!args.length) return { out: io.stdin };
   let out = "";
   let code = 0;
-  for (const file of args) if (!attempt(io, `cat: ${file}`, () => { out += read(io.ctx.fs, at(io, file)); })) code = 1;
+  for (const file of args)
+    if (
+      !attempt(io, `cat: ${file}`, () => {
+        out += read(io.ctx.fs, at(io, file));
+      })
+    )
+      code = 1;
   return { out, code };
 };
 
@@ -89,13 +105,15 @@ function eachPath(io: IO, paths: string[], verb: string, change: (path: string) 
 
 const mkdirCommand: Command = (args, io) => {
   const { flags, rest } = parseFlags(args);
-  return eachPath(io, rest, "mkdir: cannot create directory", (path) => { io.ctx.fs = mkdir(io.ctx.fs, path, flags.has("p")); });
+  return eachPath(io, rest, "mkdir: cannot create directory", (path) => {
+    io.ctx.fs = mkdir(io.ctx.fs, path, flags.has("p"));
+  });
 };
 
 const touch: Command = (args, io) =>
   eachPath(io, args, "touch: cannot touch", (path) => {
     const existing = io.ctx.fs[path];
-    io.ctx.fs = write(io.ctx.fs, path, existing?.type === "file" ? existing.content ?? "" : "");
+    io.ctx.fs = write(io.ctx.fs, path, existing?.type === "file" ? (existing.content ?? "") : "");
   });
 
 const rmCommand: Command = (args, io) => {
@@ -103,7 +121,9 @@ const rmCommand: Command = (args, io) => {
   const recursive = flags.has("r") || flags.has("R");
   const targets = flags.has("f") ? rest.filter((path) => io.ctx.fs[at(io, path)]) : rest;
   if (flags.has("f") && !targets.length) return { out: "" };
-  return eachPath(io, targets, "rm: cannot remove", (path) => { io.ctx.fs = rm(io.ctx.fs, path, recursive); });
+  return eachPath(io, targets, "rm: cannot remove", (path) => {
+    io.ctx.fs = rm(io.ctx.fs, path, recursive);
+  });
 };
 
 function transfer(name: "mv" | "cp"): Command {
@@ -120,7 +140,8 @@ function transfer(name: "mv" | "cp"): Command {
       return { out: "", code: 1 };
     }
     return eachPath(io, rest, `${name}: cannot ${name === "mv" ? "move" : "copy"}`, (path) => {
-      io.ctx.fs = name === "mv" ? mv(io.ctx.fs, path, target) : cp(io.ctx.fs, path, target, flags.has("r") || flags.has("R"));
+      io.ctx.fs =
+        name === "mv" ? mv(io.ctx.fs, path, target) : cp(io.ctx.fs, path, target, flags.has("r") || flags.has("R"));
     });
   };
 }
@@ -148,8 +169,18 @@ const tree: Command = ([target = "."], io) => {
 const pwd: Command = (_args, io) => ({ out: `${io.ctx.cwd}\n` });
 
 export const COMMANDS: Record<string, Command> = {
-  ls, cd, cat, pwd, tree, touch, mkdir: mkdirCommand, rm: rmCommand, mv: transfer("mv"), cp: transfer("cp"),
+  ls,
+  cd,
+  cat,
+  pwd,
+  tree,
+  touch,
+  mkdir: mkdirCommand,
+  rm: rmCommand,
+  mv: transfer("mv"),
+  cp: transfer("cp"),
   ...SYSTEM_COMMANDS,
 };
 
-export const displayPath = (path: string) => (path === HOME || path.startsWith(`${HOME}/`) ? `~${path.slice(HOME.length)}` : path);
+export const displayPath = (path: string) =>
+  path === HOME || path.startsWith(`${HOME}/`) ? `~${path.slice(HOME.length)}` : path;

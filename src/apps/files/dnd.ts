@@ -18,7 +18,17 @@ export function dropPaths(event: DragEvent, dir: string) {
   if (!raw) return;
   event.preventDefault();
   event.stopPropagation();
-  const paths = (JSON.parse(raw) as string[]).filter((path) => dirname(path) !== dir && !`${dir}/`.startsWith(`${path}/`));
+  const paths = (JSON.parse(raw) as string[]).filter(
+    (path) => dirname(path) !== dir && !`${dir}/`.startsWith(`${path}/`),
+  );
   if (!paths.length) return;
-  tryFs((fs) => paths.reduce((next, path) => (dir === TRASH ? trash(next, path) : event.ctrlKey ? cp(next, path, dir, true) : mv(next, path, dir)), fs), "Move");
+  tryFs(
+    (fs) =>
+      paths.reduce(
+        (next, path) =>
+          dir === TRASH ? trash(next, path) : event.ctrlKey ? cp(next, path, dir, true) : mv(next, path, dir),
+        fs,
+      ),
+    "Move",
+  );
 }

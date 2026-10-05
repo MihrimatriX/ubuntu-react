@@ -19,12 +19,22 @@ export function NoteCard({ note, onClose }: { note: Note; onClose: () => void })
         </div>
         {note.body && <p className="mt-0.5 line-clamp-3 text-sm text-white/80">{note.body}</p>}
         {note.action && (
-          <button className="mt-2 rounded-md bg-white/10 px-3 py-1 text-sm hover:bg-white/20" onClick={() => { note.action?.run(); onClose(); }}>
+          <button
+            className="mt-2 rounded-md bg-white/10 px-3 py-1 text-sm hover:bg-white/20"
+            onClick={() => {
+              note.action?.run();
+              onClose();
+            }}
+          >
             {note.action.label}
           </button>
         )}
       </div>
-      <button aria-label="Close notification" className="absolute -right-1.5 -top-1.5 grid size-5 place-items-center rounded-full bg-[#555] hover:bg-[#666]" onClick={onClose}>
+      <button
+        aria-label="Close notification"
+        className="absolute -right-1.5 -top-1.5 grid size-5 place-items-center rounded-full bg-[#555] hover:bg-[#666]"
+        onClick={onClose}
+      >
         <X className="size-3" />
       </button>
     </div>

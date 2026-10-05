@@ -8,11 +8,11 @@ Backend yok: her şey tarayıcıda çalışır ve `localStorage`'a kaydedilir.
 
 ![Terminal ve Files ile Etkinlikler görünümü](screenshots/overview.jpg)
 
-| | |
-| --- | --- |
-| ![Files](screenshots/files.jpg) **Files**: breadcrumb, arama, dikdörtgen seçim, sürükle-bırak | ![neofetch çalıştıran Terminal](screenshots/terminal.jpg) **Terminal**: ortak dosya sistemi üzerinde bash benzeri kabuk |
-| ![Text Editor](screenshots/editor.jpg) **Text Editor**: sekmeli ve sözdizimi renklendirmeli CodeMirror 6 | ![Koyu temada Settings](screenshots/dark.jpg) **Settings**: 12 panel, koyu tema, duvar kâğıtları, dock seçenekleri |
-| ![App Grid](screenshots/grid.jpg) Aramalı **App Grid** | ![Quick Settings](screenshots/quick.jpg) Alt menülü **Quick Settings** |
+|                                                                                                          |                                                                                                                         |
+| -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| ![Files](screenshots/files.jpg) **Files**: breadcrumb, arama, dikdörtgen seçim, sürükle-bırak            | ![neofetch çalıştıran Terminal](screenshots/terminal.jpg) **Terminal**: ortak dosya sistemi üzerinde bash benzeri kabuk |
+| ![Text Editor](screenshots/editor.jpg) **Text Editor**: sekmeli ve sözdizimi renklendirmeli CodeMirror 6 | ![Koyu temada Settings](screenshots/dark.jpg) **Settings**: 12 panel, koyu tema, duvar kâğıtları, dock seçenekleri      |
+| ![App Grid](screenshots/grid.jpg) Aramalı **App Grid**                                                   | ![Quick Settings](screenshots/quick.jpg) Alt menülü **Quick Settings**                                                  |
 
 ## Hızlı başlangıç
 
@@ -24,10 +24,10 @@ docker compose up -d --build
 # http://localhost:8080 adresini aç ve herhangi bir parolayla giriş yap
 ```
 
-| `.env` değişkeni | Varsayılan | Amaç |
-| --- | --- | --- |
-| `SITE_URL` | boş | Build sırasında gömülen genel URL; link önizlemeleri mutlak görsel URL'si alır (Facebook, LinkedIn, X ve Slack bunu ister). |
-| `PORT` | `8080` | Sunucudaki port. |
+| `.env` değişkeni | Varsayılan | Amaç                                                                                                                        |
+| ---------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `SITE_URL`       | boş        | Build sırasında gömülen genel URL; link önizlemeleri mutlak görsel URL'si alır (Facebook, LinkedIn, X ve Slack bunu ister). |
+| `PORT`           | `8080`     | Sunucudaki port.                                                                                                            |
 
 Container uygulamayı yalnızca düz HTTP ile sunar. Alan adı ve TLS için önüne bir reverse proxy koy.
 **Nginx Proxy Manager** ile sunucunun IP'sine ve `PORT`'a (NPM aynı Docker ağındaysa `ubuntu-react:8080`'e)
@@ -79,12 +79,12 @@ değeriyle değiştirir.
 
 ## Ek bağımlılıklar
 
-| Paket | Neden |
-| --- | --- |
-| `@codemirror/state`, `/view`, `/search`, `lang-*`, `theme-one-dark` | Editörün doğrudan kullandığı CodeMirror 6 parçaları (diller, koyu tema, arama paneli). |
-| `@xterm/addon-webgl` | Resmi xterm renderer'ı. DOM renderer Ubuntu Mono karakterlerini yanlış ölçüp sütunları kaydırıyordu (`neofetch`'te görünür); WebGL her karakteri kendi hücresine çizer. Desteklenmezse DOM'a döner. |
-| `@happy-dom/global-registrator` (dev) | `bun test` içindeki bileşen testleri için DOM. |
-| `playwright-core` (dev) | e2e kontrolleri ve ekran görüntüleri için kurulu Chrome'u sürer. |
+| Paket                                                               | Neden                                                                                                                                                                                               |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@codemirror/state`, `/view`, `/search`, `lang-*`, `theme-one-dark` | Editörün doğrudan kullandığı CodeMirror 6 parçaları (diller, koyu tema, arama paneli).                                                                                                              |
+| `@xterm/addon-webgl`                                                | Resmi xterm renderer'ı. DOM renderer Ubuntu Mono karakterlerini yanlış ölçüp sütunları kaydırıyordu (`neofetch`'te görünür); WebGL her karakteri kendi hücresine çizer. Desteklenmezse DOM'a döner. |
+| `@happy-dom/global-registrator` (dev)                               | `bun test` içindeki bileşen testleri için DOM.                                                                                                                                                      |
+| `playwright-core` (dev)                                             | e2e kontrolleri ve ekran görüntüleri için kurulu Chrome'u sürer.                                                                                                                                    |
 
 ## Mimari
 
@@ -143,6 +143,7 @@ diyaloglar, bir hata sınırı (çöken uygulama masaüstünü düşürmek yerin
 segmentli seçiciler.
 
 Uçtan uca bağlanmış GNOME davranışları:
+
 - **Masaüstü:** sıcak köşe, Screen Blank ile otomatik kilit ve kaçırılan bildirimleri sayan kilit ekranı.
 - **Pencere menüsü:** Always on Top, Move to Workspace.
 - **Dock:** yüzen (panel olmayan) mod ve sürükle-bırak destekli Çöp.

@@ -40,27 +40,68 @@ export default function Mines({ windowId }: AppProps) {
   return (
     <div className="flex h-full flex-col items-center gap-3 bg-window p-4">
       <HeaderSlot windowId={windowId}>
-        <select className="field" aria-label="Board size" value={size} onChange={(e) => restart(e.target.value as Size)}>
-          {Object.keys(SIZES).map((name) => <option key={name}>{name}</option>)}
+        <select
+          className="field"
+          aria-label="Board size"
+          value={size}
+          onChange={(e) => restart(e.target.value as Size)}
+        >
+          {Object.keys(SIZES).map((name) => (
+            <option key={name}>{name}</option>
+          ))}
         </select>
       </HeaderSlot>
       <div className="flex w-full max-w-md items-center justify-between text-sm">
-        <span className="flex items-center gap-1"><Flag className="size-4 text-red-600" />{flags} / {mines}</span>
-        <button className="btn" onClick={() => restart()}>{lost(board) ? "Try Again" : won(board) && started ? "Play Again 🎉" : "New Game"}</button>
-        <span className="tabular-nums">{String(Math.floor(seconds / 60)).padStart(2, "0")}:{String(seconds % 60).padStart(2, "0")}</span>
+        <span className="flex items-center gap-1">
+          <Flag className="size-4 text-red-600" />
+          {flags} / {mines}
+        </span>
+        <button className="btn" onClick={() => restart()}>
+          {lost(board) ? "Try Again" : won(board) && started ? "Play Again 🎉" : "New Game"}
+        </button>
+        <span className="tabular-nums">
+          {String(Math.floor(seconds / 60)).padStart(2, "0")}:{String(seconds % 60).padStart(2, "0")}
+        </span>
       </div>
       <div className="grid min-h-0 w-full flex-1 place-items-center" style={{ containerType: "size" }}>
-      <div role="grid" aria-label="Minefield" className="grid gap-0.5 text-[clamp(10px,3cqmin,20px)]"
-        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, width: `min(100cqw, 100cqh * ${cols / rows})` }}>
-        {board.map((cells, row) => cells.map((cell, col) => (
-          <button key={`${row}-${col}`} role="gridcell" aria-label={cell.open ? (cell.mine ? "mine" : String(cell.adjacent)) : cell.flag ? "flagged" : "hidden"}
-            onClick={() => open(row, col)} onContextMenu={(e) => { e.preventDefault(); if (!over) setBoard(toggleFlag(board, row, col)); }}
-            className={`grid aspect-square place-items-center rounded font-bold ${cell.open ? (cell.mine ? "bg-red-500" : "bg-view") : "bg-fg/20 hover:bg-fg/30"}`}
-            style={{ color: NUMBER_COLORS[cell.adjacent] }}>
-            {cell.open ? (cell.mine ? "💣" : cell.adjacent || "") : cell.flag ? <Flag className="size-3.5 text-red-600" /> : ""}
-          </button>
-        )))}
-      </div>
+        <div
+          role="grid"
+          aria-label="Minefield"
+          className="grid gap-0.5 text-[clamp(10px,3cqmin,20px)]"
+          style={{
+            gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+            width: `min(100cqw, 100cqh * ${cols / rows})`,
+          }}
+        >
+          {board.map((cells, row) =>
+            cells.map((cell, col) => (
+              <button
+                key={`${row}-${col}`}
+                role="gridcell"
+                aria-label={cell.open ? (cell.mine ? "mine" : String(cell.adjacent)) : cell.flag ? "flagged" : "hidden"}
+                onClick={() => open(row, col)}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  if (!over) setBoard(toggleFlag(board, row, col));
+                }}
+                className={`grid aspect-square place-items-center rounded font-bold ${cell.open ? (cell.mine ? "bg-red-500" : "bg-view") : "bg-fg/20 hover:bg-fg/30"}`}
+                style={{ color: NUMBER_COLORS[cell.adjacent] }}
+              >
+                {cell.open ? (
+                  cell.mine ? (
+                    "💣"
+                  ) : (
+                    cell.adjacent || ""
+                  )
+                ) : cell.flag ? (
+                  <Flag className="size-3.5 text-red-600" />
+                ) : (
+                  ""
+                )}
+              </button>
+            )),
+          )}
+        </div>
       </div>
     </div>
   );

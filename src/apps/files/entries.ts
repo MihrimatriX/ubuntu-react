@@ -26,7 +26,10 @@ export function entriesFor(fs: Fs, location: string, options: { hidden: boolean;
   } else if (location === STARRED) {
     entries = options.starred.map((path) => entry(path));
   } else {
-    entries = fs[location]?.type === "dir" ? list(fs, location).map((name) => entry(`${location === "/" ? "" : location}/${name}`)) : [];
+    entries =
+      fs[location]?.type === "dir"
+        ? list(fs, location).map((name) => entry(`${location === "/" ? "" : location}/${name}`))
+        : [];
   }
   return entries.filter((item): item is Entry => item !== null && (options.hidden || !item.name.startsWith(".")));
 }
@@ -34,20 +37,29 @@ export function entriesFor(fs: Fs, location: string, options: { hidden: boolean;
 const SEARCH_LIMIT = 200;
 
 /** Nautilus search: recursive name match below a folder; virtual locations (Recent, Trash…) filter their own list. */
-export function searchEntries(fs: Fs, location: string, query: string, options: { hidden: boolean; starred: string[] }): Entry[] {
+export function searchEntries(
+  fs: Fs,
+  location: string,
+  query: string,
+  options: { hidden: boolean; starred: string[] },
+): Entry[] {
   const needle = query.trim().toLowerCase();
-  const pool = location.includes("://") || location === TRASH
-    ? entriesFor(fs, location, options)
-    : walk(fs, location)
-        .filter((path) => options.hidden || !path.slice(location.length).includes("/."))
-        .map((path) => ({ path, name: basename(path), node: fs[path]! }));
+  const pool =
+    location.includes("://") || location === TRASH
+      ? entriesFor(fs, location, options)
+      : walk(fs, location)
+          .filter((path) => options.hidden || !path.slice(location.length).includes("/."))
+          .map((path) => ({ path, name: basename(path), node: fs[path]! }));
   return pool.filter((entry) => entry.name.toLowerCase().includes(needle)).slice(0, SEARCH_LIMIT);
 }
 
 export function sortEntries(entries: Entry[], key: SortKey, descending: boolean): Entry[] {
   const compare = (a: Entry, b: Entry) =>
-    key === "name" ? a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" })
-      : key === "size" ? a.node.size - b.node.size : a.node.mtime - b.node.mtime;
+    key === "name"
+      ? a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" })
+      : key === "size"
+        ? a.node.size - b.node.size
+        : a.node.mtime - b.node.mtime;
   return [...entries].sort((a, b) => {
     if (a.node.type !== b.node.type) return a.node.type === "dir" ? -1 : 1;
     return descending ? compare(b, a) : compare(a, b);
@@ -55,7 +67,13 @@ export function sortEntries(entries: Entry[], key: SortKey, descending: boolean)
 }
 
 /** New selection after clicking `path` in `ordered` (the visible order), given modifier keys and the anchor. */
-export function nextSelection(selected: string[], ordered: string[], path: string, modifiers: { ctrl: boolean; shift: boolean }, anchor: string | null): string[] {
+export function nextSelection(
+  selected: string[],
+  ordered: string[],
+  path: string,
+  modifiers: { ctrl: boolean; shift: boolean },
+  anchor: string | null,
+): string[] {
   if (modifiers.shift && anchor && ordered.includes(anchor)) {
     const [from, to] = [ordered.indexOf(anchor), ordered.indexOf(path)].sort((a, b) => a - b);
     const range = ordered.slice(from, to! + 1);

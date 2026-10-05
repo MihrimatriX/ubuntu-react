@@ -24,8 +24,21 @@ function World() {
     <div className="flex flex-col divide-y divide-line rounded-xl border border-line bg-view">
       {WORLD_CITIES.map(([city, zone]) => (
         <div key={city} className="flex items-center justify-between p-4">
-          <span><b>{city}</b><br /><span className="text-xs text-fg-dim">{new Date(now).toLocaleDateString("en-US", { timeZone: zone, weekday: "long" })}</span></span>
-          <span className="text-2xl tabular-nums">{new Date(now).toLocaleTimeString("en-US", { timeZone: zone, hour: "2-digit", minute: "2-digit", hour12: !clock24 })}</span>
+          <span>
+            <b>{city}</b>
+            <br />
+            <span className="text-xs text-fg-dim">
+              {new Date(now).toLocaleDateString("en-US", { timeZone: zone, weekday: "long" })}
+            </span>
+          </span>
+          <span className="text-2xl tabular-nums">
+            {new Date(now).toLocaleTimeString("en-US", {
+              timeZone: zone,
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: !clock24,
+            })}
+          </span>
         </div>
       ))}
     </div>
@@ -38,16 +51,44 @@ function Stopwatch() {
   const total = state.elapsed + (state.running ? now - state.startedAt : 0);
   return (
     <div className="flex flex-col items-center gap-6">
-      <span className="text-6xl font-light tabular-nums">{duration(total)}.{Math.floor((total % 1000) / 100)}</span>
+      <span className="text-6xl font-light tabular-nums">
+        {duration(total)}.{Math.floor((total % 1000) / 100)}
+      </span>
       <div className="flex gap-3">
-        <button className={`btn ${state.running ? "" : "btn-accent"}`} onClick={() => setState(state.running ? { ...state, running: false, elapsed: total } : { ...state, running: true, startedAt: Date.now() })}>
+        <button
+          className={`btn ${state.running ? "" : "btn-accent"}`}
+          onClick={() =>
+            setState(
+              state.running
+                ? { ...state, running: false, elapsed: total }
+                : { ...state, running: true, startedAt: Date.now() },
+            )
+          }
+        >
           {state.running ? "Pause" : total ? "Resume" : "Start"}
         </button>
-        <button className="btn" disabled={!total} onClick={() => setState(state.running ? { ...state, laps: [total, ...state.laps] } : { startedAt: 0, elapsed: 0, running: false, laps: [] })}>
+        <button
+          className="btn"
+          disabled={!total}
+          onClick={() =>
+            setState(
+              state.running
+                ? { ...state, laps: [total, ...state.laps] }
+                : { startedAt: 0, elapsed: 0, running: false, laps: [] },
+            )
+          }
+        >
           {state.running ? "Lap" : "Clear"}
         </button>
       </div>
-      <ol className="w-64 text-sm">{state.laps.map((lap, index) => <li key={lap} className="flex justify-between border-b border-line py-1"><span>Lap {state.laps.length - index}</span><span>{duration(lap)}</span></li>)}</ol>
+      <ol className="w-64 text-sm">
+        {state.laps.map((lap, index) => (
+          <li key={lap} className="flex justify-between border-b border-line py-1">
+            <span>Lap {state.laps.length - index}</span>
+            <span>{duration(lap)}</span>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }
@@ -66,8 +107,25 @@ function Timer() {
   return (
     <div className="flex flex-col items-center gap-6">
       <span className="text-6xl font-light tabular-nums">{duration(left + 999)}</span>
-      {!endsAt && <label className="flex items-center gap-2 text-sm">Minutes<input type="number" min={1} max={999} value={minutes} className="field w-24" onChange={(e) => setMinutes(Math.max(1, Number(e.target.value) || 1))} /></label>}
-      <button className={`btn ${endsAt ? "" : "btn-accent"}`} onClick={() => setEndsAt(endsAt ? null : Date.now() + minutes * 60_000)}>{endsAt ? "Cancel" : "Start"}</button>
+      {!endsAt && (
+        <label className="flex items-center gap-2 text-sm">
+          Minutes
+          <input
+            type="number"
+            min={1}
+            max={999}
+            value={minutes}
+            className="field w-24"
+            onChange={(e) => setMinutes(Math.max(1, Number(e.target.value) || 1))}
+          />
+        </label>
+      )}
+      <button
+        className={`btn ${endsAt ? "" : "btn-accent"}`}
+        onClick={() => setEndsAt(endsAt ? null : Date.now() + minutes * 60_000)}
+      >
+        {endsAt ? "Cancel" : "Start"}
+      </button>
     </div>
   );
 }
@@ -78,9 +136,16 @@ export default function Clocks({ windowId }: AppProps) {
   return (
     <div className="h-full overflow-auto bg-window p-6">
       <HeaderSlot windowId={windowId} side="center">
-        <Segmented label="View" value={tab} options={{ World: "World", Stopwatch: "Stopwatch", Timer: "Timer" }} onChange={setTab} />
+        <Segmented
+          label="View"
+          value={tab}
+          options={{ World: "World", Stopwatch: "Stopwatch", Timer: "Timer" }}
+          onChange={setTab}
+        />
       </HeaderSlot>
-      <div className="mx-auto max-w-xl"><Page /></div>
+      <div className="mx-auto max-w-xl">
+        <Page />
+      </div>
     </div>
   );
 }

@@ -7,8 +7,19 @@ import { cascade, workArea, type Rect, type SnapState } from "../lib/snap";
 import type { OSState } from "./store";
 
 export type Win = {
-  id: string; appId: string; title: string; rect: Rect; state: SnapState;
-  minimized: boolean; workspace: number; z: number; filePath?: string; args?: string[]; dirty?: boolean; confirmClose?: boolean; above?: boolean;
+  id: string;
+  appId: string;
+  title: string;
+  rect: Rect;
+  state: SnapState;
+  minimized: boolean;
+  workspace: number;
+  z: number;
+  filePath?: string;
+  args?: string[];
+  dirty?: boolean;
+  confirmClose?: boolean;
+  above?: boolean;
 };
 
 type OpenOptions = { filePath?: string; args?: string[]; newWindow?: boolean };
@@ -26,7 +37,10 @@ export type WindowSlice = {
   toggleMaximize: (id: string) => void;
   snapWindow: (id: string, state: SnapState) => void;
   moveWindow: (id: string, rect: Rect) => void;
-  patchWindow: (id: string, patch: Partial<Pick<Win, "title" | "dirty" | "filePath" | "confirmClose" | "above">>) => void;
+  patchWindow: (
+    id: string,
+    patch: Partial<Pick<Win, "title" | "dirty" | "filePath" | "confirmClose" | "above">>,
+  ) => void;
   activateApp: (appId: string) => void;
   switchWorkspace: (index: number) => void;
   moveToWorkspace: (id: string, index: number) => void;
@@ -51,9 +65,14 @@ export function compactWorkspaces(windows: Win[], active: number): { windows: Wi
 }
 
 const currentArea = (state: OSState) =>
-  workArea({ w: globalThis.innerWidth || 1280, h: globalThis.innerHeight || 800 }, {
-    position: state.settings.dockPosition, iconSize: state.settings.dockIconSize, autohide: state.settings.dockAutohide,
-  });
+  workArea(
+    { w: globalThis.innerWidth || 1280, h: globalThis.innerHeight || 800 },
+    {
+      position: state.settings.dockPosition,
+      iconSize: state.settings.dockIconSize,
+      autohide: state.settings.dockAutohide,
+    },
+  );
 
 let windowCounter = 0;
 
@@ -74,15 +93,24 @@ export const createWindowSlice: StateCreator<OSState, [], [], WindowSlice> = (se
       const state = get();
       const existing = state.windows.find((win) => win.appId === appId);
       if (existing && app.singleInstance) {
-        if (options.args || options.filePath) update(existing.id, () => ({ args: options.args, filePath: options.filePath }));
+        if (options.args || options.filePath)
+          update(existing.id, () => ({ args: options.args, filePath: options.filePath }));
         get().focusWindow(existing.id);
         return existing.id;
       }
       const id = `${appId}-${++windowCounter}`;
       const onWorkspace = state.windows.filter((win) => win.workspace === state.workspace).length;
       const win: Win = {
-        id, appId, title: app.name, rect: cascade(onWorkspace, app.defaultSize, currentArea(state)), state: "normal",
-        minimized: false, workspace: state.workspace, z: topZ(state.windows) + 1, filePath: options.filePath, args: options.args,
+        id,
+        appId,
+        title: app.name,
+        rect: cascade(onWorkspace, app.defaultSize, currentArea(state)),
+        state: "normal",
+        minimized: false,
+        workspace: state.workspace,
+        z: topZ(state.windows) + 1,
+        filePath: options.filePath,
+        args: options.args,
       };
       set({ windows: [...state.windows, win] });
       return id;

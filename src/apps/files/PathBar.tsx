@@ -8,14 +8,24 @@ import { RECENT, STARRED } from "./entries";
 
 const SPECIAL: Record<string, string> = { [RECENT]: "Recent", [STARRED]: "Starred", [TRASH]: "Trash" };
 
-type Props = { location: string; editing: boolean; setEditing: (editing: boolean) => void; onNavigate: (path: string) => void };
+type Props = {
+  location: string;
+  editing: boolean;
+  setEditing: (editing: boolean) => void;
+  onNavigate: (path: string) => void;
+};
 
 export function PathBar({ location, editing, setEditing, onNavigate }: Props) {
   const [text, setText] = useState("");
   const inHome = location === HOME || location.startsWith(`${HOME}/`);
   const parts = inHome ? location.slice(HOME.length).split("/").filter(Boolean) : location.split("/").filter(Boolean);
   const crumbs = [{ label: inHome ? "Home" : "/", path: inHome ? HOME : "/" }];
-  parts.forEach((part, index) => crumbs.push({ label: part, path: `${crumbs[0]!.path === "/" ? "" : crumbs[0]!.path}/${parts.slice(0, index + 1).join("/")}` }));
+  parts.forEach((part, index) =>
+    crumbs.push({
+      label: part,
+      path: `${crumbs[0]!.path === "/" ? "" : crumbs[0]!.path}/${parts.slice(0, index + 1).join("/")}`,
+    }),
+  );
 
   if (editing) {
     const submit = () => {
@@ -25,23 +35,43 @@ export function PathBar({ location, editing, setEditing, onNavigate }: Props) {
       setEditing(false);
     };
     return (
-      <input autoFocus aria-label="Location" defaultValue={location.includes("://") ? "" : location} onChange={(e) => setText(e.target.value)}
-        onFocus={(e) => { setText(e.target.value); e.target.select(); }} onBlur={() => setEditing(false)}
-        onKeyDown={(e) => { e.stopPropagation(); if (e.key === "Enter") submit(); if (e.key === "Escape") setEditing(false); }}
-        className="field w-[420px] max-w-full" />
+      <input
+        autoFocus
+        aria-label="Location"
+        defaultValue={location.includes("://") ? "" : location}
+        onChange={(e) => setText(e.target.value)}
+        onFocus={(e) => {
+          setText(e.target.value);
+          e.target.select();
+        }}
+        onBlur={() => setEditing(false)}
+        onKeyDown={(e) => {
+          e.stopPropagation();
+          if (e.key === "Enter") submit();
+          if (e.key === "Escape") setEditing(false);
+        }}
+        className="field w-[420px] max-w-full"
+      />
     );
   }
 
   return (
-    <div className="flex h-[34px] min-w-0 items-center gap-0.5 rounded-md bg-hover px-1 text-sm" onClick={(e) => e.target === e.currentTarget && setEditing(true)}>
+    <div
+      className="flex h-[34px] min-w-0 items-center gap-0.5 rounded-md bg-hover px-1 text-sm"
+      onClick={(e) => e.target === e.currentTarget && setEditing(true)}
+    >
       {SPECIAL[location] ? (
         <span className="px-2 font-bold">{SPECIAL[location]}</span>
       ) : (
         crumbs.map((crumb, index) => (
           <span key={crumb.path} className="flex min-w-0 items-center">
             {index > 0 && <span className="px-0.5 text-fg-dim">/</span>}
-            <button className={`flex items-center gap-1.5 truncate rounded px-2 py-1 hover:bg-hover ${index === crumbs.length - 1 ? "font-bold" : ""}`} onClick={() => onNavigate(crumb.path)}>
-              {crumb.label === "Home" && <Home className="size-3.5" />}{crumb.label}
+            <button
+              className={`flex items-center gap-1.5 truncate rounded px-2 py-1 hover:bg-hover ${index === crumbs.length - 1 ? "font-bold" : ""}`}
+              onClick={() => onNavigate(crumb.path)}
+            >
+              {crumb.label === "Home" && <Home className="size-3.5" />}
+              {crumb.label}
             </button>
           </span>
         ))

@@ -66,7 +66,11 @@ describe("workspaces", () => {
     expect(workspaceCount(os())).toBe(1);
   });
   test("compactWorkspaces removes gaps but keeps the active one", () => {
-    const wins = [{ workspace: 0 }, { workspace: 3 }].map((w, i) => ({ ...os().windows[0], id: `w${i}`, ...w })) as never;
+    const wins = [{ workspace: 0 }, { workspace: 3 }].map((w, i) => ({
+      ...os().windows[0],
+      id: `w${i}`,
+      ...w,
+    })) as never;
     const result = compactWorkspaces(wins, 2);
     expect(result.workspace).toBe(1);
     expect(result.windows.map((win) => win.workspace)).toEqual([0, 2]);

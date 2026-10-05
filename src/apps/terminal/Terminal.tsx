@@ -18,7 +18,8 @@ export default function TerminalApp({ windowId, args }: AppProps) {
   // xterm measures the cell size once; opening it before Ubuntu Mono has loaded misaligns every column.
   const [fontReady, setFontReady] = useState(() => document.fonts.check(FONT));
   useEffect(() => {
-    if (!fontReady) Promise.all([document.fonts.load(FONT), document.fonts.load(`bold ${FONT}`)]).finally(() => setFontReady(true));
+    if (!fontReady)
+      Promise.all([document.fonts.load(FONT), document.fonts.load(`bold ${FONT}`)]).finally(() => setFontReady(true));
   }, [fontReady]);
   const sessions = useRef(new Map<number, TermSession>());
   const hosts = useRef(new Map<number, HTMLDivElement>());
@@ -82,29 +83,68 @@ export default function TerminalApp({ windowId, args }: AppProps) {
     const term = sessions.current.get(active)?.term;
     const selection = term?.getSelection() ?? "";
     return [
-      { label: "Copy", shortcut: "Shift+Ctrl+C", disabled: !selection, action: () => navigator.clipboard?.writeText(selection) },
-      { label: "Paste", shortcut: "Shift+Ctrl+V", action: () => navigator.clipboard?.readText().then((text) => term?.paste(text)).catch(() => undefined) },
+      {
+        label: "Copy",
+        shortcut: "Shift+Ctrl+C",
+        disabled: !selection,
+        action: () => navigator.clipboard?.writeText(selection),
+      },
+      {
+        label: "Paste",
+        shortcut: "Shift+Ctrl+V",
+        action: () =>
+          navigator.clipboard
+            ?.readText()
+            .then((text) => term?.paste(text))
+            .catch(() => undefined),
+      },
       { label: "Select All", action: () => term?.selectAll() },
       "separator",
       { label: "New Tab", shortcut: "Shift+Ctrl+T", action: addTab },
-      { label: "New Window", shortcut: "Shift+Ctrl+N", action: () => useOS.getState().openApp("terminal", { newWindow: true }) },
+      {
+        label: "New Window",
+        shortcut: "Shift+Ctrl+N",
+        action: () => useOS.getState().openApp("terminal", { newWindow: true }),
+      },
       "separator",
       { label: "Clear", action: () => term?.clear() },
     ];
   }
 
   return (
-    <div className="flex h-full flex-col bg-[#300a24]" onPointerDown={() => setTimeout(() => sessions.current.get(active)?.term.focus())}>
+    <div
+      className="flex h-full flex-col bg-[#300a24]"
+      onPointerDown={() => setTimeout(() => sessions.current.get(active)?.term.focus())}
+    >
       <HeaderSlot windowId={windowId}>
-        <button aria-label="New Tab" title="New Tab (Ctrl+Shift+T)" className="btn btn-flat" onClick={addTab}><Plus className="size-4" /></button>
+        <button aria-label="New Tab" title="New Tab (Ctrl+Shift+T)" className="btn btn-flat" onClick={addTab}>
+          <Plus className="size-4" />
+        </button>
       </HeaderSlot>
       {tabs.length > 1 && (
-        <TabStrip tabs={tabs} active={active} title={(tab) => tab.title} onSelect={setActive} onClose={closeTab} className="bg-header p-1 [&>[role=tab]]:max-w-none" />
+        <TabStrip
+          tabs={tabs}
+          active={active}
+          title={(tab) => tab.title}
+          onSelect={setActive}
+          onClose={closeTab}
+          className="bg-header p-1 [&>[role=tab]]:max-w-none"
+        />
       )}
-      <div ref={container} className="relative min-h-0 flex-1" onContextMenu={(e) => useOS.getState().openMenu(e, terminalMenu())}>
+      <div
+        ref={container}
+        className="relative min-h-0 flex-1"
+        onContextMenu={(e) => useOS.getState().openMenu(e, terminalMenu())}
+      >
         {tabs.map((tab) => (
-          <div key={tab.id} ref={(el) => { if (el) hosts.current.set(tab.id, el); }}
-            className="absolute inset-0 py-1 pl-2" style={{ visibility: tab.id === active ? "visible" : "hidden" }} />
+          <div
+            key={tab.id}
+            ref={(el) => {
+              if (el) hosts.current.set(tab.id, el);
+            }}
+            className="absolute inset-0 py-1 pl-2"
+            style={{ visibility: tab.id === active ? "visible" : "hidden" }}
+          />
         ))}
       </div>
     </div>

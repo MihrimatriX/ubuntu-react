@@ -46,5 +46,7 @@ test("searchEntries finds names recursively and skips hidden paths", () => {
   const fs = write(seedFs(), `${HOME}/.local/notes-hidden.md`, "x");
   expect(searchEntries(fs, HOME, "NOTES", opts).map((entry) => entry.path)).toEqual([`${HOME}/Documents/notes.md`]);
   expect(searchEntries(fs, HOME, "notes", { ...opts, hidden: true })).toHaveLength(2);
-  expect(searchEntries(trash(fs, `${HOME}/README.txt`), TRASH, "read", opts).map((entry) => entry.name)).toEqual(["README.txt"]);
+  expect(searchEntries(trash(fs, `${HOME}/README.txt`), TRASH, "read", opts).map((entry) => entry.name)).toEqual([
+    "README.txt",
+  ]);
 });

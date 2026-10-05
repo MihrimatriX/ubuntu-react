@@ -1,6 +1,13 @@
-// Libadwaita preference widgets shared by the Settings pages: titled groups of boxed-list rows and a switch.
+// Libadwaita preference widgets shared by the Settings pages: titled groups of boxed-list rows, a switch and
+// `set(key)`, the curried settings writer every control uses as its onChange.
 import type { ReactNode } from "react";
+import { useOS, type Settings } from "../../os/store";
 export { Switch } from "../../shell/chrome";
+
+export const set =
+  <K extends keyof Settings>(key: K) =>
+  (value: Settings[K]) =>
+    useOS.getState().setSetting(key, value);
 
 export function Group({ title, children }: { title?: string; children: ReactNode }) {
   return (
@@ -11,7 +18,17 @@ export function Group({ title, children }: { title?: string; children: ReactNode
   );
 }
 
-export function Row({ title, subtitle, children, disabled }: { title: string; subtitle?: string; children?: ReactNode; disabled?: boolean }) {
+export function Row({
+  title,
+  subtitle,
+  children,
+  disabled,
+}: {
+  title: string;
+  subtitle?: string;
+  children?: ReactNode;
+  disabled?: boolean;
+}) {
   return (
     <div className={`flex min-h-14 items-center gap-4 px-4 py-2 ${disabled ? "opacity-50" : ""}`}>
       <div className="min-w-0 flex-1">
@@ -22,4 +39,3 @@ export function Row({ title, subtitle, children, disabled }: { title: string; su
     </div>
   );
 }
-

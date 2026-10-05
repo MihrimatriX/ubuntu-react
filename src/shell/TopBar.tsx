@@ -2,7 +2,19 @@
 // (→ Quick Settings). The clock re-renders exactly on minute boundaries; the top-left pixel is the hot
 // corner (opens the Overview when enabled); battery state comes from the Battery Status API when available.
 import { useEffect, useState } from "react";
-import { BatteryCharging, BatteryFull, BatteryLow, BatteryMedium, BellOff, Bluetooth, Power, Volume2, VolumeX, Wifi, WifiOff } from "lucide-react";
+import {
+  BatteryCharging,
+  BatteryFull,
+  BatteryLow,
+  BatteryMedium,
+  BellOff,
+  Bluetooth,
+  Power,
+  Volume2,
+  VolumeX,
+  Wifi,
+  WifiOff,
+} from "lucide-react";
 import { useOS } from "../os/store";
 import { workspaceCount } from "../os/windows";
 import { CalendarPopover } from "./CalendarPopover";
@@ -27,11 +39,14 @@ export function useBattery() {
     let manager: BatteryManager | undefined;
     const read = () => manager && setBattery({ level: Math.round(manager.level * 100), charging: manager.charging });
     const getBattery = (navigator as Navigator & { getBattery?: () => Promise<BatteryManager> }).getBattery;
-    getBattery?.call(navigator).then((found) => {
-      manager = found;
-      read();
-      ["levelchange", "chargingchange"].forEach((type) => found.addEventListener(type, read));
-    }).catch(() => undefined);
+    getBattery
+      ?.call(navigator)
+      .then((found) => {
+        manager = found;
+        read();
+        ["levelchange", "chargingchange"].forEach((type) => found.addEventListener(type, read));
+      })
+      .catch(() => undefined);
     return () => ["levelchange", "chargingchange"].forEach((type) => manager?.removeEventListener(type, read));
   }, []);
   return battery;
@@ -65,18 +80,45 @@ export function TopBar() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-[6000] flex h-8 items-center justify-between bg-black px-1.5 text-sm font-medium text-white">
-      <div aria-hidden className="absolute left-0 top-0 size-1" onPointerEnter={() => settings.hotCorner && useOS.getState().setOverlay(overlay === "none" ? "overview" : "none")} />
-      <button aria-label="Activities" aria-expanded={overlay !== "none"} className={`${pill} gap-1.5`}
-        onClick={() => useOS.getState().setOverlay(overlay === "none" ? "overview" : "none")}>
+      <div
+        aria-hidden
+        className="absolute left-0 top-0 size-1"
+        onPointerEnter={() =>
+          settings.hotCorner && useOS.getState().setOverlay(overlay === "none" ? "overview" : "none")
+        }
+      />
+      <button
+        aria-label="Activities"
+        aria-expanded={overlay !== "none"}
+        className={`${pill} gap-1.5`}
+        onClick={() => useOS.getState().setOverlay(overlay === "none" ? "overview" : "none")}
+      >
         {Array.from({ length: count }, (_, index) => (
-          <i key={index} className={`block h-2 rounded-full bg-white transition-all ${index === workspace ? "w-8" : "w-2 opacity-60"}`} />
+          <i
+            key={index}
+            className={`block h-2 rounded-full bg-white transition-all ${index === workspace ? "w-8" : "w-2 opacity-60"}`}
+          />
         ))}
       </button>
-      <button aria-expanded={popover === "calendar"} className={`${pill} absolute left-1/2 -translate-x-1/2 gap-2`} onClick={() => toggle("calendar")}>
-        {now.toLocaleDateString("en-US", { month: "short", day: "numeric" })}&nbsp;&nbsp;{formatTime(now, settings.clock24)}
-        {settings.dnd ? <BellOff className="size-3.5" /> : unread && <i className="block size-1.5 rounded-full bg-white" />}
+      <button
+        aria-expanded={popover === "calendar"}
+        className={`${pill} absolute left-1/2 -translate-x-1/2 gap-2`}
+        onClick={() => toggle("calendar")}
+      >
+        {now.toLocaleDateString("en-US", { month: "short", day: "numeric" })}&nbsp;&nbsp;
+        {formatTime(now, settings.clock24)}
+        {settings.dnd ? (
+          <BellOff className="size-3.5" />
+        ) : (
+          unread && <i className="block size-1.5 rounded-full bg-white" />
+        )}
       </button>
-      <button aria-label="System menu" aria-expanded={popover === "quick"} className={`${pill} gap-2.5 [&>svg]:size-4`} onClick={() => toggle("quick")}>
+      <button
+        aria-label="System menu"
+        aria-expanded={popover === "quick"}
+        className={`${pill} gap-2.5 [&>svg]:size-4`}
+        onClick={() => toggle("quick")}
+      >
         {settings.wifi ? <Wifi /> : <WifiOff />}
         {settings.bluetooth && <Bluetooth />}
         {settings.volume > 0 ? <Volume2 /> : <VolumeX />}
@@ -86,7 +128,11 @@ export function TopBar() {
       {popover !== "none" && (
         <>
           <div className="fixed inset-0 top-8" onPointerDown={() => setPopover("none")} />
-          {popover === "calendar" ? <CalendarPopover onClose={() => setPopover("none")} /> : <QuickSettings close={() => setPopover("none")} />}
+          {popover === "calendar" ? (
+            <CalendarPopover onClose={() => setPopover("none")} />
+          ) : (
+            <QuickSettings close={() => setPopover("none")} />
+          )}
         </>
       )}
     </header>

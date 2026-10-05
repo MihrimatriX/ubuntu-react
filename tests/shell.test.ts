@@ -20,8 +20,16 @@ function session(...lines: string[]) {
 describe("tokenize/parse", () => {
   test("quotes, escapes and operators", () => {
     expect(tokenize(`echo "a b" 'c|d' e\\ f>>x&&ls|wc`)).toEqual([
-      { word: "echo" }, { word: "a b" }, { word: "c|d" }, { word: "e f" }, { op: ">>" }, { word: "x" },
-      { op: "&&" }, { word: "ls" }, { op: "|" }, { word: "wc" },
+      { word: "echo" },
+      { word: "a b" },
+      { word: "c|d" },
+      { word: "e f" },
+      { op: ">>" },
+      { word: "x" },
+      { op: "&&" },
+      { word: "ls" },
+      { op: "|" },
+      { word: "wc" },
     ]);
     expect(tokenize(`echo ""`)).toEqual([{ word: "echo" }, { word: "" }]);
   });
@@ -69,7 +77,9 @@ describe("file commands", () => {
   test("tree, touch, head/tail, wc", () => {
     expect(session("tree Documents").output).toContain("└── notes.md\n\n0 directories, 2 files");
     expect(read(session("touch new.txt").fs, `${HOME}/new.txt`)).toBe("");
-    expect(session("tail -n 1 Documents/notes.md").output).toBe("- [ ] Change the wallpaper (right-click the desktop)\n");
+    expect(session("tail -n 1 Documents/notes.md").output).toBe(
+      "- [ ] Change the wallpaper (right-click the desktop)\n",
+    );
     expect(session("echo a b c | wc -w").output).toBe("3\n");
   });
 });
@@ -85,9 +95,13 @@ describe("system commands", () => {
     expect(session("grep -i WELCOME README.txt").output).toContain("Welcome");
   });
   test("launchers return effects instead of acting", () => {
-    expect(session("gedit notes.txt").effects).toEqual([{ type: "open", appId: "text-editor", path: `${HOME}/notes.txt` }]);
+    expect(session("gedit notes.txt").effects).toEqual([
+      { type: "open", appId: "text-editor", path: `${HOME}/notes.txt` },
+    ]);
     expect(session("gedit notes.txt").fs[`${HOME}/notes.txt`]).toBeDefined();
-    expect(session("xdg-open Pictures").effects).toEqual([{ type: "open", appId: undefined, path: `${HOME}/Pictures` }]);
+    expect(session("xdg-open Pictures").effects).toEqual([
+      { type: "open", appId: undefined, path: `${HOME}/Pictures` },
+    ]);
     expect(session("firefox example.com").effects).toEqual([{ type: "open", appId: "firefox", args: ["example.com"] }]);
     expect(session("clear").effects).toEqual([{ type: "clear" }]);
   });
@@ -100,8 +114,14 @@ describe("tab completion", () => {
     expect(complete("cat Documents/no", HOME, seedFs())).toEqual({ line: "cat Documents/notes.md ", options: [] });
   });
   test("several matches extend to the common prefix and list the options", () => {
-    expect(complete("cd D", HOME, seedFs())).toEqual({ line: "cd D", options: ["Desktop/", "Documents/", "Downloads/"] });
-    expect(applyCompletion("ls ", "M", ["Music/", "Music2/"])).toEqual({ line: "ls Music", options: ["Music/", "Music2/"] });
+    expect(complete("cd D", HOME, seedFs())).toEqual({
+      line: "cd D",
+      options: ["Desktop/", "Documents/", "Downloads/"],
+    });
+    expect(applyCompletion("ls ", "M", ["Music/", "Music2/"])).toEqual({
+      line: "ls Music",
+      options: ["Music/", "Music2/"],
+    });
   });
   test("no match leaves the line alone", () => {
     expect(complete("cat zzz", HOME, seedFs())).toEqual({ line: "cat zzz", options: [] });

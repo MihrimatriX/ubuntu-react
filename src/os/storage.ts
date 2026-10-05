@@ -16,7 +16,8 @@ export function createStorage<T extends object>(onNearQuota: (usedChars: number)
     },
     setItem(name, value) {
       const state = value.state;
-      const unchanged = lastState && Object.keys(state).every((key) => state[key as keyof T] === lastState?.[key as keyof T]);
+      const unchanged =
+        lastState && Object.keys(state).every((key) => state[key as keyof T] === lastState?.[key as keyof T]);
       if (unchanged) return;
       lastState = state;
       const raw = JSON.stringify(value);

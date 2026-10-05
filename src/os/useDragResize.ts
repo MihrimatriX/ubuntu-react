@@ -2,20 +2,42 @@
 // drag only the CSS transform changes (resize writes size directly) — zero React renders — and the final
 // rect is committed to the store on pointerup. Dragging a snapped window first restores its normal size.
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type RefObject } from "react";
-import { clampRect, resizeRect, snapZone, unsnapRect, workArea, type Edge, type Rect, type Size, type SnapState } from "../lib/snap";
+import {
+  clampRect,
+  resizeRect,
+  snapZone,
+  unsnapRect,
+  workArea,
+  type Edge,
+  type Rect,
+  type Size,
+  type SnapState,
+} from "../lib/snap";
 import { useOS } from "./store";
 
 export type Zone = Exclude<SnapState, "normal"> | null;
 
 type Options = {
-  displayed: Rect; normal: Rect; state: SnapState; area: Rect; min: Size;
-  onMove: (rect: Rect) => void; onSnap: (zone: Exclude<Zone, null>) => void; onPreview: (zone: Zone) => void;
+  displayed: Rect;
+  normal: Rect;
+  state: SnapState;
+  area: Rect;
+  min: Size;
+  onMove: (rect: Rect) => void;
+  onSnap: (zone: Exclude<Zone, null>) => void;
+  onPreview: (zone: Zone) => void;
 };
 
 const DRAG_THRESHOLD = 4;
 
 export function applyRect(el: HTMLElement, rect: Rect, offsetX = 0) {
-  Object.assign(el.style, { left: `${rect.x + offsetX}px`, top: `${rect.y}px`, width: `${rect.w}px`, height: `${rect.h}px`, transform: "" });
+  Object.assign(el.style, {
+    left: `${rect.x + offsetX}px`,
+    top: `${rect.y}px`,
+    width: `${rect.w}px`,
+    height: `${rect.h}px`,
+    transform: "",
+  });
 }
 
 /** Title-bar elements that keep their own clicks: no drag, double-click or window menu starts on them. */
@@ -26,7 +48,12 @@ export const CONTROLS = "button, input, textarea, select, a, [role=tab]";
  * if it did. Capture starts only then: capturing on pointerdown retargets the click to the captor, so plain
  * clicks on header widgets (path bar, tabs) would never reach them.
  */
-export function track(event: ReactPointerEvent, threshold: number, move: (dx: number, dy: number, e: PointerEvent) => void, end: () => void) {
+export function track(
+  event: ReactPointerEvent,
+  threshold: number,
+  move: (dx: number, dy: number, e: PointerEvent) => void,
+  end: () => void,
+) {
   const target = event.currentTarget as HTMLElement;
   const { pointerId, clientX: startX, clientY: startY } = event;
   let started = false;
@@ -70,23 +97,28 @@ export function useDragResize(ref: RefObject<HTMLElement | null>, options: Optio
     let base = opts.displayed;
     let last = base;
     let zone: Zone = null;
-    track(event, DRAG_THRESHOLD, (dx, dy, e) => {
-      if (el.dataset.gesture !== "drag" && opts.state !== "normal") {
-        base = unsnapRect(opts.displayed, opts.normal, { x: e.clientX - dx, y: e.clientY - dy });
-        applyRect(el, base, el.offsetLeft - opts.displayed.x);
-      }
-      el.dataset.gesture = "drag";
-      last = clampRect({ ...base, x: base.x + dx, y: base.y + dy }, opts.area);
-      el.style.transform = `translate(${last.x - base.x}px, ${last.y - base.y}px)`;
-      const nextZone = snapZone({ x: e.clientX, y: e.clientY }, opts.area);
-      if (nextZone !== zone) {
-        zone = nextZone;
-        opts.onPreview(zone);
-      }
-    }, () => {
-      opts.onPreview(null);
-      commit(el, () => (zone ? opts.onSnap(zone) : opts.onMove(last)));
-    });
+    track(
+      event,
+      DRAG_THRESHOLD,
+      (dx, dy, e) => {
+        if (el.dataset.gesture !== "drag" && opts.state !== "normal") {
+          base = unsnapRect(opts.displayed, opts.normal, { x: e.clientX - dx, y: e.clientY - dy });
+          applyRect(el, base, el.offsetLeft - opts.displayed.x);
+        }
+        el.dataset.gesture = "drag";
+        last = clampRect({ ...base, x: base.x + dx, y: base.y + dy }, opts.area);
+        el.style.transform = `translate(${last.x - base.x}px, ${last.y - base.y}px)`;
+        const nextZone = snapZone({ x: e.clientX, y: e.clientY }, opts.area);
+        if (nextZone !== zone) {
+          zone = nextZone;
+          opts.onPreview(zone);
+        }
+      },
+      () => {
+        opts.onPreview(null);
+        commit(el, () => (zone ? opts.onSnap(zone) : opts.onMove(last)));
+      },
+    );
   }
 
   function startResize(edge: Edge, event: ReactPointerEvent) {
@@ -96,13 +128,18 @@ export function useDragResize(ref: RefObject<HTMLElement | null>, options: Optio
     const opts = latest.current;
     const offsetX = el.offsetLeft - opts.displayed.x;
     let last = opts.displayed;
-    track(event, 0, (dx, dy) => {
-      el.dataset.gesture = "resize";
-      last = resizeRect(opts.displayed, edge, dx, dy, opts.min);
-      applyRect(el, last, offsetX);
-    }, () => {
-      commit(el, () => opts.onMove(clampRect(last, opts.area)));
-    });
+    track(
+      event,
+      0,
+      (dx, dy) => {
+        el.dataset.gesture = "resize";
+        last = resizeRect(opts.displayed, edge, dx, dy, opts.min);
+        applyRect(el, last, offsetX);
+      },
+      () => {
+        commit(el, () => opts.onMove(clampRect(last, opts.area)));
+      },
+    );
   }
 
   return { startDrag, startResize };

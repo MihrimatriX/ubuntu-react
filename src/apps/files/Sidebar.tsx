@@ -7,10 +7,16 @@ import { dropPaths } from "./dnd";
 import { RECENT, STARRED } from "./entries";
 
 const PLACES: [string, string, ReactNode][] = [
-  [RECENT, "Recent", <Clock />], [STARRED, "Starred", <Star />], [HOME, "Home", <Home />],
-  [`${HOME}/Desktop`, "Desktop", <Monitor />], [`${HOME}/Documents`, "Documents", <FileText />],
-  [`${HOME}/Downloads`, "Downloads", <Download />], [`${HOME}/Music`, "Music", <Music />],
-  [`${HOME}/Pictures`, "Pictures", <Image />], [`${HOME}/Videos`, "Videos", <Video />], [TRASH, "Trash", <Trash2 />],
+  [RECENT, "Recent", <Clock />],
+  [STARRED, "Starred", <Star />],
+  [HOME, "Home", <Home />],
+  [`${HOME}/Desktop`, "Desktop", <Monitor />],
+  [`${HOME}/Documents`, "Documents", <FileText />],
+  [`${HOME}/Downloads`, "Downloads", <Download />],
+  [`${HOME}/Music`, "Music", <Music />],
+  [`${HOME}/Pictures`, "Pictures", <Image />],
+  [`${HOME}/Videos`, "Videos", <Video />],
+  [TRASH, "Trash", <Trash2 />],
 ];
 
 export function Sidebar({ current, onNavigate }: { current: string; onNavigate: (path: string) => void }) {
@@ -20,12 +26,17 @@ export function Sidebar({ current, onNavigate }: { current: string; onNavigate: 
       {PLACES.map(([path, label, icon]) => {
         const exists = path.includes("://") || fs[path];
         return (
-          <button key={path} disabled={!exists} aria-current={current === path}
+          <button
+            key={path}
+            disabled={!exists}
+            aria-current={current === path}
             onClick={() => onNavigate(path)}
             onDragOver={(e) => !path.includes("://") && e.preventDefault()}
             onDrop={(e) => dropPaths(e, path)}
-            className={`flex h-9 items-center gap-3 rounded-md px-3 text-left [&>svg]:size-4 disabled:opacity-40 ${current === path ? "bg-accent/15 font-bold text-accent" : "hover:bg-hover"}`}>
-            {icon}{label}
+            className={`flex h-9 items-center gap-3 rounded-md px-3 text-left [&>svg]:size-4 disabled:opacity-40 ${current === path ? "bg-accent/15 font-bold text-accent" : "hover:bg-hover"}`}
+          >
+            {icon}
+            {label}
           </button>
         );
       })}

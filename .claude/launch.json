@@ -1,7 +1,0 @@
-{
-  "version": "0.0.1",
-  "configurations": [
-    { "name": "dev", "runtimeExecutable": "bun", "runtimeArgs": ["./index.html", "--port=5173"], "port": 5173 },
-    { "name": "dist", "runtimeExecutable": "bun", "runtimeArgs": ["-e", "Bun.serve({ port: 5174, fetch: (req) => { const p = new URL(req.url).pathname; return new Response(Bun.file('dist' + (p === '/' ? '/index.html' : p))); } })"], "port": 5174 }
-  ]
-}
