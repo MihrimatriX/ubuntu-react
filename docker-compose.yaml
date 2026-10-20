@@ -1,0 +1,15 @@
+# docker compose up -d --build
+# In Nginx Proxy Manager, add a Proxy Host that forwards to this machine's IP on ${PORT:-8080} (or to
+# `ubuntu-react:8080` if NPM shares a Docker network with this container), and enable SSL there.
+# Set SITE_URL in .env (e.g. SITE_URL=https://ubuntu.example.com) so link previews get absolute image URLs.
+services:
+  ubuntu-react:
+    build:
+      context: .
+      args:
+        SITE_URL: ${SITE_URL:-}
+    image: ubuntu-react
+    container_name: ubuntu-react
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8080}:8080"
